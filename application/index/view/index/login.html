@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录页面</title>
+    <link href="__PUBLIC__/static/styles/less/login.less" rel="stylesheet/less">
+    <script src="__PUBLIC__/static/lib/less-3.9.0.js"></script>
+    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>    
+    <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
+    <script src="__PUBLIC__/static/lib/layui/layui.js"></script>
+
+</head>
+<body>
+    <header>
+        <span>
+            北理珠商学院自主报账系统
+        </span>
+    </header>
+    <main>
+        <h1>
+            用户登录
+        </h1>
+        <form class="layui-form" action="">
+            <!-- 帐号 -->
+            <div class="input-container">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">帐号</label>
+                    <div class="layui-input-block">
+                    <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题"  class="layui-input">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 密码 -->
+            <div class="input-container">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-block">
+                    <input type="password" name="password" required lay-verify="required"  placeholder="请输入密码" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+         
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">身份</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="男" title="教师"">
+                    <input type="radio" name="sex" value="女" title="管理员" checked>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </main>
+    
+    <h3 id="error-text"></h3>
+    <script>
+   
+    layui.use(['form'], function(){
+        var form = layui.form;
+    
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+    });
+    </script>
+</body>
+</html>

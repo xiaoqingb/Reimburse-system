@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>注册页面</title>
+    <link href="__PUBLIC__/static/styles//less/regist.less" rel="stylesheet/less">
+    <script src="__PUBLIC__/static/lib/less-3.9.0.js"></script>
+    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
+    <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
+    <script src="__PUBLIC__/static/lib/layui/layui.js"></script>
+
+</head>
+<body>
+    <!-- <img src="jpg\regist.jpg"> -->
+    <main >
+        <div id='regist-frame'>
+                <h1>
+                    用户注册
+                </h1>
+                <form class="layui-form" action="">
+                    <!-- 身份 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">身份</label>
+                        <div class="layui-input-block">
+                        <input type="radio" name="job" value="男" title="教师" checked>
+                        <input type="radio" name="job" value="女" title="管理员" >
+                        </div>
+                    </div>
+
+                    <!-- 帐号 -->
+                    <div class="input-container">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">帐号</label>
+                            <div class="layui-input-block">
+                            <input type="text" name="title" required  lay-verify="required" placeholder="请输入教职工号"  class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 密码 -->
+                    <div class="input-container">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">密码</label>
+                            <div class="layui-input-block">
+                            <input type="password" name="password" required lay-verify="required"  placeholder="请输入密码" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 姓名   -->
+                    <div class="input-container">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-input-block">
+                            <input type="password" name="password" required lay-verify="required"  autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                 
+                    <!-- 专业   -->
+                    <div class="input-container">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">专业</label>
+                            <div class="layui-input-block">
+                            <input type="text" name="password"   placeholder="管理员不必填" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="layui-form-label">学院</label>
+                        <div id="select-box">
+                            <select name="city" lay-verify="">
+                                <option value="">管理员不必填</option>
+                                <option value="1">外国语学院</option>
+                                <option value="2">电信学院</option>
+                                <option value="3">美术学院</option>
+                            </select>  
+                        </div>
+                        
+                        </div>
+                    </div>
+                           
+                    
+                    <!-- 联系方式 -->
+                    <div class="input-container">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">联系方式</label>
+                            <div class="layui-input-block">
+                            <input type="password" name="password" required lay-verify="required"  placeholder="手机号码" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+        </div>
+    </main>
+    <h3 id="error-text"></h3>
+    <script>
+         layui.use(['form'], function(){
+            var form = layui.form;
+        
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+
+
