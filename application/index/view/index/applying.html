@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
+    <link rel="stylesheet/less" type="text/css" href="__PUBLIC__/static/styles/less/index.less">
+    <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
+    <script src="__PUBLIC__/static/lib/less-3.9.0.js"></script>
+    <script src="__PUBLIC__/static/lib/layui/layui.js"></script>
+    <title>商学院自主报账系统</title>
+</head>
+
+<body>
+    <header >
+        <div id="system-name">
+            商学院自主报账系统
+        </div>
+        <ul class="layui-nav " lay-filter="">
+            <li class="layui-nav-item">
+              <a href="javascript:;">用户名</a>
+              <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                <dd><a href="">个人资料</a></dd>
+                <dd><a href="">注销</a></dd>
+              </dl>
+            </li>
+        </ul>
+    </header>
+    <main>
+        <div id="menu">
+            <ul class="" lay-filter="test">
+                <li class="menu-item ">
+                    <div class="hover-label"></div>
+                    <a id="apply" >申请报销</a>
+                </li>
+                <li class="menu-item bg-dark">
+                    <div class="hover-label"></div>
+                    <a id="applying">申请中</a>
+                </li>
+                <li class="menu-item">
+                    <div class="hover-label"></div>
+                    <a id="applied">已报销</a>
+                </li>
+                <li class="menu-item">
+                    <div class="hover-label"></div>
+                    <a id="profile">个人资料</a>
+                </li>
+            </ul>
+        </div>
+        <div id="window">
+            申请中
+        </div>
+    </main>
+    <script>
+        layui.use(['element'], function () {
+                let element = layui.element
+        });
+        window.onload = function(){
+            $('.menu-item').click(function(){
+                // $('#iframe')[0].src = this.children[1].id;
+                location.href = this.children[1].id
+            })
+        }
+    </script>
+</body>
+</html>

@@ -17,7 +17,12 @@ return [
         ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
         ':name' => ['index/hello', ['method' => 'post']],
     ],
+    '/'=>'index/index/index',
     'login'=>'index/index/login',
-    'regist'=>'index/index/regist'
+    'regist'=>'index/index/regist',
+    'apply'=>'index/index/index',
+    'applying'=>'index/index/applying',
+    'applied'=>'index/index/applied',
+    'profile'=>'index/index/profile'
 
-];
+ ];

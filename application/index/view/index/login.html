@@ -22,7 +22,7 @@
         <h1>
             用户登录
         </h1>
-        <form class="layui-form" action="">
+        <div class="layui-form" >
             <!-- 帐号 -->
             <div class="input-container">
                 <div class="layui-form-item">
@@ -44,33 +44,47 @@
          
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">身份</label>
+                <label class="layui-form-label" id="identity">身份</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="sex" value="男" title="教师"">
+                    <input type="radio" name="sex" value="男" title="教师">
                     <input type="radio" name="sex" value="女" title="管理员" checked>
                 </div>
             </div>
             <div class="layui-form-item">
                 <div class="layui-input-block">
-                <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                <button id="login-btn" class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
                 <button type="reset" class="layui-btn layui-btn-primary">重置</button>
                 </div>
             </div>
-        </form>
+        </div>
     </main>
-    
-    <h3 id="error-text"></h3>
     <script>
-   
-    layui.use(['form'], function(){
-        var form = layui.form;
-    
-        //监听提交
-        form.on('submit(formDemo)', function(data){
-            layer.msg(JSON.stringify(data.field));
-            return false;
+        let login = (loginData)=>{
+            console.log(loginData);
+            $.ajax({
+                url: "__PUBLIC__/index/user/login",
+                type: "post",
+                data: loginData,
+                success:(response)=>{
+                    response = JSON.parse(response);
+                    console.log(response);
+                    if(response.code!=="0000"){
+                        $("#error-text").html(response.msg);
+                        return;
+                    }
+                    location.href="index.html";
+                }
+            });
+        }
+        layui.use(['form'], function(){
+            var form = layui.form;
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+                layer.msg(JSON.stringify(data.field));
+                login(JSON.stringify(data.field))
+            });
         });
-    });
+   
     </script>
 </body>
 </html>

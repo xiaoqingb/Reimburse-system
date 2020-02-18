@@ -13,19 +13,18 @@
 
 </head>
 <body>
-    <!-- <img src="jpg\regist.jpg"> -->
-    <main >
+    <main>
         <div id='regist-frame'>
                 <h1>
                     用户注册
                 </h1>
-                <form class="layui-form" action="">
+                <div class="layui-form" action="">
                     <!-- 身份 -->
                     <div class="layui-form-item">
                         <label class="layui-form-label">身份</label>
                         <div class="layui-input-block">
-                        <input type="radio" name="job" value="男" title="教师" checked>
-                        <input type="radio" name="job" value="女" title="管理员" >
+                        <input type="radio" name="job" value="教师" title="教师" checked>
+                        <input type="radio" name="job" value="管理员" title="管理员" >
                         </div>
                     </div>
 
@@ -34,7 +33,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">帐号</label>
                             <div class="layui-input-block">
-                            <input type="text" name="title" required  lay-verify="required" placeholder="请输入教职工号"  class="layui-input">
+                            <input type="text" name="account" required  lay-verify="required" placeholder="请输入教职工号"  class="layui-input">
                             </div>
                         </div>
                     </div>
@@ -54,31 +53,27 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">姓名</label>
                             <div class="layui-input-block">
-                            <input type="password" name="password" required lay-verify="required"  autocomplete="off" class="layui-input">
+                            <input type="text" name="name" required lay-verify="required"  autocomplete="off" class="layui-input">
                         </div>
-                    </div>
+                        </div>
                  
                     <!-- 专业   -->
-                    <div class="input-container">
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">专业</label>
-                            <div class="layui-input-block">
-                            <input type="text" name="password"   placeholder="管理员不必填" autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-
                     <div>
-                        <label class="layui-form-label">学院</label>
+                        <label class="layui-form-label">专业</label>
                         <div id="select-box">
-                            <select name="city" lay-verify="">
-                                <option value="">管理员不必填</option>
-                                <option value="1">外国语学院</option>
-                                <option value="2">电信学院</option>
-                                <option value="3">美术学院</option>
+                            <select name="major" lay-verify="">
+                                <option value="">管理员不用选择</option>
+                                <option value="人力资源">人力资源</option>
+                                <option value="信息管理与信息系统">信息管理与信息系统</option>
+                                <option value="市场营销">市场营销</option>
+                                <option value="国际商务">国际商务</option>
+                                <option value="工程管理">工程管理</option>
+                                <option value="物流管理">物流管理</option>
+                                <option value="国际经济与国际贸易">国际经济与国际贸易</option>
                             </select>  
                         </div>
                         
-                        </div>
+                    </div>
                     </div>
                            
                     
@@ -87,30 +82,47 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">联系方式</label>
                             <div class="layui-input-block">
-                            <input type="password" name="password" required lay-verify="required"  placeholder="手机号码" autocomplete="off" class="layui-input">
+                            <input type="text" name="phone" required lay-verify="required"  placeholder="手机号码" autocomplete="off" class="layui-input">
                         </div>
                     </div>
 
                     <div class="layui-form-item">
                         <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                        <button id="regist-btn" class="layui-btn" lay-submit lay-filter="formDemo">注册</button>
                         <button type="reset" class="layui-btn layui-btn-primary">重置</button>
                         </div>
                     </div>
-                </form>
+                </div>
         </div>
     </main>
-    <h3 id="error-text"></h3>
     <script>
-         layui.use(['form'], function(){
+        let regist = (loginData)=>{
+            console.log(loginData);
+            $.ajax({
+                url: "__PUBLIC__/index/user/regist",
+                type: "post",
+                data: loginData,
+                success:(response)=>{
+                    response = JSON.parse(response);
+                    console.log(response);
+                    if(response.code!=="0000"){
+                        layer.msg(response.msg);
+                        return;
+                    }
+                    // location.href="index.html";
+                }
+            });
+        }
+        layui.use(['form'], function(){
             var form = layui.form;
-        
             //监听提交
             form.on('submit(formDemo)', function(data){
-                layer.msg(JSON.stringify(data.field));
-                return false;
+                // layer.msg(JSON.stringify(data.field));
+                console.log(data.field);
+                regist(data.field)
             });
         });
+   
     </script>
 </body>
 
