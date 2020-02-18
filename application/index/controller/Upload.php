@@ -34,7 +34,7 @@ class Upload extends Controller
                     //成功上传后 获取上传信息
                     $name_path =str_replace('\\',"/",$info->getSavename());
                     $result["code"] = '0000';
-                    $result["msg"] = $file;
+                    $result["msg"] = '上传成功';
                     $result['data'] = "__PUBLIC__/uploads/editor/".$name_path;
                 }else{
                     // 上传失败获取错误信息

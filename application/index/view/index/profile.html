@@ -46,15 +46,15 @@
         * by zhangxinxu 2011-09-12
         */
 
-        var params = {
+        let params = {
             fileInput: $("#fileImage").get(0),				//html file控件
             dragDrop:  $("#fileDragArea").get(0),					//拖拽敏感区域
             upButton: $("#fileSubmit").get(0),					//提交按钮
             // url: $("#uploadForm").attr("action"),						//ajax地址
             fileFilter: [],					//过滤后的文件数组
             filter: function(files) {
-                var arrFiles = [];
-                for (var i = 0, file; file = files[i]; i++) {
+                let arrFiles = [];
+                for (let i = 0, file; file = files[i]; i++) {
                     if (file.type.indexOf("image") == 0) {
                         // if (file.size >= 512000) {
                         if (file.size >= 5120000) {
@@ -69,12 +69,12 @@
                 return arrFiles;
             },
             onSelect: function(files) {
-                var html = '', i = 0;
+                let html = '', i = 0;
                 $("#preview").html('<div class="upload_loading"></div>');
-                var funAppendImage = function() {
+                let funAppendImage = function() {
                     file = files[i];
                     if (file) {
-                        var reader = new FileReader()
+                        let reader = new FileReader()
                         reader.onload = function(e) {
                             html = html + '<div id="uploadList_'+ i +'" class="upload_append_list"><p><strong>' + file.name + '</strong>'+ 
                                 '<a href="javascript:" class="upload_delete" title="删除" data-index="'+ i +'">删除</a><br />' +
@@ -120,12 +120,12 @@
             //文件上传进度
             onProgress: function(file, loaded, total) {
                 console.log((loaded / total * 100).toFixed(2) + '%')
-                var eleProgress = $("#uploadProgress_" + file.index), percent = (loaded / total * 100).toFixed(2) + '%';
+                let eleProgress = $("#uploadProgress_" + file.index), percent = (loaded / total * 100).toFixed(2) + '%';
                 eleProgress.show().html(percent);
             },		
             //文件上传成功时
-            onSuccess: function(response) {
-                $("#uploadInf").append(`<p>上传成功，图片地址是： ${response} </p>`);
+            onSuccess: function(msg) {
+                $("#uploadInf").append(`图片<${msg}>上传成功`);
             },		
             //文件上传失败时,
             onFailure: function(file) {
@@ -153,7 +153,7 @@
                 this.funDragHover(e);
                         
                 // 获取文件列表对象
-                var files = e.target.files || e.dataTransfer.files;
+                let files = e.target.files || e.dataTransfer.files;
                 //继续添加文件
                 this.fileFilter = this.fileFilter.concat(this.filter(files));
                 this.funDealFiles();
@@ -162,7 +162,7 @@
             
             //选中文件的处理与回调
             funDealFiles: function() {
-                for (var i = 0, file; file = this.fileFilter[i]; i++) {
+                for (let i = 0, file; file = this.fileFilter[i]; i++) {
                     //增加唯一索引值
                     file.index = i;
                 }
@@ -173,8 +173,8 @@
             
             //删除对应的文件
             funDeleteFile: function(fileDelete) {
-                var arrFile = [];
-                for (var i = 0, file; file = this.fileFilter[i]; i++) {
+                let arrFile = [];
+                for (let i = 0, file; file = this.fileFilter[i]; i++) {
                     if (file != fileDelete) {
                         arrFile.push(file);
                     } else {
@@ -187,14 +187,14 @@
             
             //文件上传
             funUploadFile: function() {
-                var self = this;	
+                let self = this;	
                 // if (location.host.indexOf("sitepointstatic") >= 0) {
                 //     //非站点服务器上运行
                 //     return;	
                 // }
-                for (var i = 0, file; file = this.fileFilter[i]; i++) {
+                for (let i = 0, file; file = this.fileFilter[i]; i++) {
                     // (function(file) {
-                    //     var xhr = new XMLHttpRequest();
+                    //     let xhr = new XMLHttpRequest();
                     //     if (xhr.upload) {
                     //         // 上传中
                     //         xhr.upload.addEventListener("progress", function(e) {
@@ -229,30 +229,40 @@
                                   
                     $.ajax({
                         type:"post",
-                        async:true,  //这里要设置异步上传，才能成功调用myXhr.upload.addEventListener('progress',function(e){}),progress的回掉函数
+                        // async:true,  //这里要设置异步上传，才能成功调用myXhr.upload.addEventListener('progress',function(e){}),progress的回掉函数
                         Accept:'text/html;charset=UTF-8',
                         data:formData,
                         contentType:"multipart/form-data",
                         url: '__PUBLIC__/index/Upload/uploadImg',
                         processData: false, // 告诉jQuery不要去处理发送的数据
                         contentType: false, // 告诉jQuery不要去设置Content-Type请求头
-                        xhr:function(){                        
-                            myXhr = $.ajaxSettings.xhr();
-                            if(myXhr.upload){ // check if upload property exists
-                                myXhr.upload.addEventListener('progress',function(e){                            
-                                    var loaded = e.loaded;                  //已经上传大小情况 
-                                    var total = e.total;                      //附件总大小 
-                                    var percent = Math.floor(100*loaded/total)+"%";     //已经上传的百分比  
-                                    // console.log("已经上传了："+percent);  
-                                    var eleProgress = $("#uploadProgress_" + i), percent = (loaded / total * 100).toFixed(2) + '%';
-                                    eleProgress.show().html(percent);               
-                                    // $("#processBar").css("width",percent);                                                                
-                                }, false); // for handling the progress of the upload
+                        // 加载的百分比显示
+                        // xhr:function(){                        
+                        //     myXhr = $.ajaxSettings.xhr();
+                        //     if(myXhr.upload){ // check if upload property exists
+                        //         myXhr.upload.addEventListener('progress',function(e){                            
+                        //             let loaded = e.loaded;                  //已经上传大小情况 
+                        //             let total = e.total;                      //附件总大小 
+                        //             let percent = Math.floor(100*loaded/total)+"%";     //已经上传的百分比  
+                        //             console.log("已经上传了：" + percent);  
+                        //             // let eleProgress = $("#uploadProgress_" + i), percent = (loaded / total * 100).toFixed(2) + '%';
+                        //             // eleProgress.show().html(percent);               
+                        //             // $("#processBar").css("width",percent);                                                                
+                        //         }, false); // for handling the progress of the upload
+                        //     }
+                        //     return myXhr;
+                        // },                    
+                        success:function(response){   
+                            response = JSON.parse(response) 
+                            console.log(response.msg)                  
+                            console.log(self.fileFilter)
+                            console.log(file)
+                            self.onSuccess(file.name)
+                            self.funDeleteFile(file)
+                            if (!self.fileFilter.length) {
+                                //全部完毕
+                                self.onComplete();	
                             }
-                            return myXhr;
-                        },                    
-                        success:function(data){                      
-                            console.log("上传成功!!!!");                        
                         },
                         error:function(){
                             alert("上传失败！");
@@ -263,8 +273,7 @@
             },
             
             init: function() {
-                var self = this;
-                
+                let self = this;
                 if (this.dragDrop) {
                     this.dragDrop.addEventListener("dragover", function(e) { self.funDragHover(e); }, false);
                     this.dragDrop.addEventListener("dragleave", function(e) { self.funDragHover(e); }, false);
@@ -282,27 +291,8 @@
                 } 
             }
         };
-        ZXXFILE = $.extend(ZXXFILE, params)
-        ZXXFILE.init()
-
-        // $.ajax({
-        //     url: "__PUBLIC__/index/Upload/uploadImg",
-        //     type: "post",
-        //     data: {
-        //         id: $(this).data("id"),
-        //     },
-        //     success:  (response)=>{
-        //         console.log(response)
-        //         // 记得转化为json对象
-        //         // response = JSON.parse(response)
-        //         // 错误则输出信息
-        //         if (response.code !== "0000") {
-        //             $("#error-text").html(response.msg)
-        //             return
-        //         }
-        //         getQuestionList(currentPage)
-        //     }
-        // });
+        upload1 = $.extend(ZXXFILE, params)
+        upload1.init()
     </script>
 </body>
 </html>
