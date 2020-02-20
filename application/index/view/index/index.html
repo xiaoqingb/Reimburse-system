@@ -224,24 +224,24 @@
                         </tr>
                         <tr>
                             <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
+                            <td class="assets-item"></td>
                         </tr>
                     </table>
                     <button type="button" id="back-3" class="layui-btn ">完成</button>
@@ -271,20 +271,20 @@
                             <th rowspan="1">到达</th>
                         </tr>
                         <tr>
-                            <td></td>
+                            <td id="business-1"></td>
                             <td id="level">
-                                <select id="level-select" name="level-type" lay-verify="required">
+                                <select id="business-2" name="level-type" lay-verify="required">
                                     <option value="1">老师</option>
                                     <option value="2">副院长</option>
                                     <option value="2">院长</option>
                                 </select>
                             </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td id="trip-sum" class="standard">0</td>
+                            <td id="business-3"></td>
+                            <td id="business-4"></td>
+                            <td id="business-5"></td>
+                            <td id="business-6"></td>
+                            <td id="business-7"></td>
+                            <td id="business-8" class="standard">0</td>
                         </tr>
                     </table>
                     <table>
@@ -312,18 +312,18 @@
                             <th rowspan="1">费用</th>
                         </tr>
                         <tr>
-                            <td class="cost"></td>
-                            <td class="cost"></td>
-                            <td class="cost"></td>
-                            <td class="cost"></td>
-                            <td id="hotel-expense-standard" class="standard">450</td>
-                            <td class="cost"></td>
-                            <td class="standard">100</td>
-                            <td class="cost"></td>
-                            <td class="standard">100</td>
-                            <td class="cost"></td>
-                            <td class="cost"></td>
-                            <td class="cost"></td>
+                            <td  id="business-9" class="cost"></td>
+                            <td  id="business-10" class="cost"></td>
+                            <td  id="business-11" class="cost"></td>
+                            <td  id="business-12" class="cost"></td>
+                            <td id="business-13" class="standard">450</td>
+                            <td id="business-14" class="cost"></td>
+                            <td id="business-15" class="standard">100</td>
+                            <td id="business-16" class="cost"></td>
+                            <td id="business-17" class="standard">100</td>
+                            <td  id="business-18" class="cost"></td>
+                            <td  id="business-19" class="cost"></td>
+                            <td  id="business-20" class="cost"></td>
                         </tr>
                     </table>
                     <button type="button" id="next-2-1" class="layui-btn ">填写交通费详单</button>
@@ -352,12 +352,12 @@
                             <th>到达</th>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="traffic-item"></td>
+                            <td class="traffic-item"></td>
+                            <td class="traffic-item"></td>
+                            <td class="traffic-item"></td>
+                            <td class="traffic-item"></td>
+                            <td class="traffic-item"></td>
                         </tr>
                     </table>
                     <table>
@@ -365,7 +365,7 @@
                             <th rowspan="1" >合计</th>
                         </tr>
                         <tr>
-                            <td>1</td>
+                            <td id="trafic-sum"></td>
                         </tr>
                     </table>
                     <h1>
@@ -419,7 +419,7 @@
 
         // 差旅费合计函数
         function caculate(){
-            var count = Number($('#trip-sum')['0'].innerText)
+            var count = Number($('#business-8')['0'].innerText)
             for(let i = 0; i < 9 ; i++){
                 let patten = /^[0-9]{0,8}$/
                 let num = $('.cost')[`${i}`].innerText
@@ -432,28 +432,28 @@
                 // console.log(Number(num))
             }
             // 数据无误即可更新合计
-            $('#trip-sum')['0'].innerText = count
+            $('#business-8')['0'].innerText = count
         }
 
         // 表格编辑
         function bindTd (){
             
                 // 级别选择
-                $("#level-select").change(function(){
+                $("#business-2").change(function(){
                     // 下标是1，则为教师级别
                     if(($(this)['0'].value) === '1'){
-                        console.log($("#hotel-expense-standard"))
-                        $("#hotel-expense-standard").html('450')
+                        console.log($("#business-13"))
+                        $("#business-13").html('450')
                     }else{
                         // 其他下标为正副院长级别
-                        $("#hotel-expense-standard").html('550')
+                        $("#business-13").html('550')
                     }
                 })
 
                 // 表格点击
                 $("td").click(function (event) {
                     //  忽略掉不能做修改的几个格子，如标准，合计这些
-                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard'){
+                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard' ){
                         return
                     }
                     
@@ -524,8 +524,6 @@
                 $("#form-2")[0].style.display = 'block'
             })
             $('#next-2').click(() => {
-                // 切换到上传发票页面
-                // 修改内容
                 $("#header").html(`
                     <span>申请报表  > </span>
                     <span>选择类型  > </span>
@@ -536,8 +534,6 @@
                 $("#form-4")[0].style.display = 'block'
             })
             $('#next-2-1').click(() => {
-                // 切换到上传发票页面
-                // 修改内容
                 $("#header").html(`
                     <span>申请报表  > </span>
                     <span>选择类型  > </span>
@@ -549,8 +545,6 @@
                 $("#form-5")[0].style.display = 'block'
             })
             $('#next-3').click(() => {
-                // 切换到上传发票页面
-                // 修改内容
                 $("#header").html(`
                     <span>申请报表  > </span>
                     <span>选择类型  > </span>
@@ -569,7 +563,6 @@
                 $("#form-2")[0].style.display = 'none'
             })
             $('#back-2').click(() => {
-                console.log('object');
                 $("#header").html(`
                     <span>申请报表  > </span>
                     <span>选择类型  > </span>
@@ -601,31 +594,32 @@
             
             // 新增行
             $('#new-row-assets').click(()=>{
-                $('#assets').append(`
+                let length = $('.assets-item').length/18 +1
+                $($('#assets').get(0).childNodes[1]).append(`
                     <tr>
-                        <td>${$('#assets')['0'].childElementCount+1}</td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td>${length}</td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
+                        <td class="new-row-assets-${length} assets-item"></td>
                     </tr>
                 `)
                 // 拿到新一行中每个td
-                let  className = `.new-row-assets-${$('#assets')['0'].childElementCount}`
+                let  className = `.new-row-assets-${length}`
                 // 给每个td绑定事件
                 $(`${className}`).click(function (event) {
                     //  忽略掉不能做修改的几个格子，如标准，合计这些
@@ -680,18 +674,19 @@
                 })
             })
             $('#new-row-traffic').click(()=>{
-                $('#traffic').append(`
+                let length = $('.traffic-item').length/6 + 1
+                $($('#traffic').get(0).childNodes[1]).append(`
                     <tr>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
-                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="new-row-traffic-${length} traffic-item"></td>
                     </tr>
                 `)
                 // 拿到新一行中每个td
-                let  className = `.new-row-traffic-${$('#assets')['0'].childElementCount}`
+                let  className = `.new-row-traffic-${length}`
                 // 给每个td绑定事件
                 $(`${className}`).click(function (event) {
                     //  忽略掉不能做修改的几个格子，如标准，合计这些
