@@ -22,28 +22,27 @@ class Upload extends Controller
         // return '0';
         $file = request()->file('file');
         // foreach($files as $file){
-            //上传回调error为0
-            if(empty($file)){
-                $result["code"] = "0001";
-                $result["msg"] = "文件不存在";
+        // }
+        if(empty($file)){
+            $result["code"] = "0001";
+            $result["msg"] = "文件不存在";
+        }else{
+            // 移动到框架应用根目录/public/uploads/ 目录下
+            $info = $file->move(ROOT_PATH . 'public' .DS. 'uploads/editor','');
+            if($info){
+                // $name_path =$info->getFilename();
+                //成功上传后 获取上传信息
+                $name_path =str_replace('\\',"/",$info->getSavename());
+                $result["code"] = '0000';
+                $result["msg"] = '上传成功';
+                $result['data'] = "uploads/editor/".$name_path;
             }else{
-                // 移动到框架应用根目录/public/uploads/ 目录下
-                $info = $file->move(ROOT_PATH . 'public' .DS. 'uploads/editor' );
-                if($info){
-                    // $name_path =$info->getFilename();
-                    //成功上传后 获取上传信息
-                    $name_path =str_replace('\\',"/",$info->getSavename());
-                    $result["code"] = '0000';
-                    $result["msg"] = '上传成功';
-                    $result['data'] = "__PUBLIC__/uploads/editor/".$name_path;
-                }else{
-                    // 上传失败获取错误信息
-                    $result["code"] = "0002";
-                    $result["msg"] = "上传失败";
-                }
+                // 上传失败获取错误信息
+                $result["code"] = "0002";
+                $result["msg"] = "上传失败";
             }
-            exit(json_encode($result));
         }
-    // }
+        exit(json_encode($result));
+    }
     
 }

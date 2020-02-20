@@ -8,24 +8,26 @@
     <!-- <link href="__PUBLIC__/static/styles/less/apply.less" rel="stylesheet/less"> -->
     <link rel="stylesheet/less" type="text/css" href="__PUBLIC__/static/styles/less/index.less">
     <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
-    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>    
+    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
     <script src="__PUBLIC__/static/lib/less-3.9.0.js"></script>
     <script src="__PUBLIC__/static/lib/layui/layui.js"></script>
+
     <title>商学院自主报账系统</title>
 </head>
 
 <body>
-    <header >
+    <header>
         <div id="system-name">
             商学院自主报账系统
         </div>
         <ul class="layui-nav " lay-filter="">
             <li class="layui-nav-item">
-              <a href="javascript:;">用户名</a>
-              <dl class="layui-nav-child"> <!-- 二级菜单 -->
-                <dd><a href="">个人资料</a></dd>
-                <dd><a href="">注销</a></dd>
-              </dl>
+                <a href="javascript:;">用户名</a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd><a href="">个人资料</a></dd>
+                    <dd><a href="">注销</a></dd>
+                </dl>
             </li>
         </ul>
     </header>
@@ -34,7 +36,7 @@
             <ul class="" lay-filter="test">
                 <li class="menu-item bg-dark">
                     <div class="hover-label"></div>
-                    <a id="/" >申请报销</a>
+                    <a id="apply">申请报销</a>
                 </li>
                 <li class="menu-item">
                     <div class="hover-label"></div>
@@ -50,37 +52,25 @@
                 </li>
             </ul>
         </div>
-            <div id="page">
-                <div id="header">
-                    <span>申请报销 > </span>
-                    <span class="current">选择类型</span>
-                </div>
-                <div id="content">
-                    <form id="form-1" class="layui-form" action="">
-                        <h2>申请报销日期</h2>
-                        <div class="layui-form-item">
-                            <!-- <label for="layui-form-label">日期</label> -->
-                            <div class="layui-block"> 
-                                <input type="text" class="layui-input" id="date" autocomplete="false">
-                            </div>
+        <div id="page">
+            <div id="header">
+                <span>申请报销 > </span>
+                <span class="current">选择类型</span>
+            </div>
+            <div id="content">
+                <form id="form-1" class="layui-form layui-form-pane" action="">
+                    <!-- <h2>申请报销日期</h2> -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">日期</label>
+                        <div class="layui-inline">
+                            <input type="text" name='date' class="layui-input" id="date" autocomplete="false">
                         </div>
-                        <!-- 专业选择
-                        <div class="layui-form-item" id='major'>
-                            <label class="layui-form-label">专业</label>
-                            <div class="layui-input-block">
-                            <select name="major" lay-verify="required" >
-                                <option value="">请选择</option>
-                                <option value="1">计算机与科学</option>
-                                <option value="2">物联网工程</option>
-                                <option value="3">软件工程</option>
-                            </select>
-                            </div>
-                        </div> -->
-                        <h2>申请报销类型</h2>
-                        <div class="layui-form-item" id='type'>
-                            <!-- <label class="layui-form-label">报销类型</label> -->
-                            <div class="layui-block">
-                            <select name="type" lay-verify="required" >
+                    </div>
+                    <!-- <h2>申请报销类型</h2> -->
+                    <div class="layui-form-item" id='type'>
+                        <label class="layui-form-label">报销类型</label>
+                        <div class="layui-inline">
+                            <select id="select" name="type" lay-verify="required">
                                 <option value=""></option>
                                 <option value="1">质量工程</option>
                                 <option value="2">学术讲座</option>
@@ -89,146 +79,693 @@
                                 <option value="5">实践教学经费</option>
                                 <option value="6">学生活动经费</option>
                             </select>
-                            </div>
                         </div>
-                        <button type="button" id="next" class="layui-btn ">下一步</button>
-                    </form>
-                    <form id='form-2' class="layui-form" > 
-                        <div class="layui-form-item" id='major'>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">办公费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
+                    </div>
+                    <button type="button" id="next-1" class="layui-btn ">下一步</button>
+                </form>
+                <form id='form-2' class="layui-form layui-form-pane">
+                    <h1>请填写各项总金额后按要求上传图片，文件名需跟实际内容保持一致，如（培训费发票，培训新闻稿）</h1>
+                    <div class="layui-form-item" id='major'>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">办公费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-1" placeholder="总额（元）" autocomplete="off" class="layui-input">
                             </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">招待费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload-2">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
                             </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">会议费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload-3">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">培训费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload-4">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
-                                <span>需附带新闻稿，邀请函</span>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">学生活动费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload-5">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
-                                <span>需附带新闻稿</span>
-                            </div>
-                            <div class="layui-form-item">
-                                <label class="layui-form-label">学生竞赛费</label>
-                                <div class="layui-input-inline">
-                                <input type="text" name="" placeholder="总消费（元）" autocomplete="off" class="layui-input">
-                                </div>
-                                <button type="button" class="layui-btn layui-bg-gray" id="upload-6">
-                                    <i class="layui-icon">&#xe67c;</i>上传发票
-                                </button>
-                                <span>需附带比赛证明，获奖情况，邀请函</span>
-                            </div>
+                            <span>请上传发票</span>
                         </div>
-                        <button type="button" id="back" class="layui-btn ">上一步</button>
-                        <button type="button" id="submit" class="layui-btn ">提交</button>
-                            
-                    </form>
-                    
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">招待费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-2" placeholder="同上" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage1" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票</span>
+
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">会议费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-3" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage2" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票</span>
+
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">培训费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-4" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage3" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票+带新闻稿+邀请函</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">学生活动费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-5" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage4" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票+新闻稿</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">学生竞赛费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-6" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage5" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票+比赛证明+获奖情况+邀请函</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">材料物料费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-7" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="upload-btn">
+                                <span>上传图片</span>
+                                <input id="fileImage6" type="file" size="0" name="fileselect[]" multiple
+                                    accept="image/jpeg,image/png" />
+                            </div>
+                            <span>请上传发票+物料清单</span>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">差旅费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-8" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <button type="button" id="next-2" class="layui-btn ">填写详细单据</button>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">固定资产费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-9" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <button type="button" id="next-3" class="layui-btn ">填写详细单据</button>
+                        </div>
+                    </div>
+                    <button type="button" id="back-1" class="layui-btn ">后退</button>
+                    <button type="button" id="submit" class="layui-btn layui-btn-warm">提交</button>
+
+                </form>
+
+                <div id="form-3">
+                    <h2>
+                        固定资产报销（若无直接提交）
+                        <div>
+                            <button id="new-row-assets" class="layui-btn">新增一行</button>
+                            <button id="remove-row-assets" class="layui-btn">删除一行</button>
+                        </div>
+                    </h2>
+                    <table id="assets">
+                        <tr>
+                            <th></th>
+                            <th>资产名称</th>
+                            <th>型号</th>
+                            <th>规格</th>
+                            <th>品牌</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>金额</th>
+                            <th>经费科目</th>
+                            <th>来源</th>
+                            <th>使用方向</th>
+                            <th>存放地点</th>
+                            <th>供应商</th>
+                            <th>生产厂家</th>
+                            <th>购置日期</th>
+                            <th>发票号</th>
+                            <th>合同号</th>
+                            <th>采购单</th>
+                            <th>对应采购数量</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <button type="button" id="back-3" class="layui-btn ">完成</button>
+                
+                </div>
+
+                <div id="form-4">
+                    <h2>
+                        差旅费报销
+                    </h2>
+                    <table >
+                        <tr>
+                            <th colspan="10">基本信息</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2">出差人</th>
+                            <th rowspan="2">级别</th>
+                            <th rowspan="2">出差事由</th>
+                            <th rowspan="1" colspan="2">出发时间(年-月-日)</th>
+                            <th rowspan="1" colspan="2">出差地点</th>
+                            <th rowspan="2">费用合计</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="1">开始</th>
+                            <th rowspan="1">结束</th>
+                            <th rowspan="1">出发</th>
+                            <th rowspan="1">到达</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td id="level">
+                                <select id="level-select" name="level-type" lay-verify="required">
+                                    <option value="1">老师</option>
+                                    <option value="2">副院长</option>
+                                    <option value="2">院长</option>
+                                </select>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td id="trip-sum" class="standard">0</td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <th colspan="12">费用支出明细</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="1" colspan="4">城市间交通费</th>
+                            <th rowspan="1" colspan="2">住宿费</th>
+                            <th rowspan="1" colspan="2">伙食补助费</th>
+                            <th rowspan="1" colspan="2">市内交通费</th>
+                            <th rowspan="2" colspan="1">培训费</th>
+                            <th rowspan="2" colspan="1">其他</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="1">火车</th>
+                            <th rowspan="1">飞机</th>
+                            <th rowspan="1">汽车</th>
+                            <th rowspan="1">其他</th>
+                            <th rowspan="1">标准</th>
+                            <th rowspan="1">费用</th>
+                            <th rowspan="1">标准</th>
+                            <th rowspan="1">费用</th>
+                            <th rowspan="1">标准</th>
+                            <th rowspan="1">费用</th>
+                        </tr>
+                        <tr>
+                            <td class="cost"></td>
+                            <td class="cost"></td>
+                            <td class="cost"></td>
+                            <td class="cost"></td>
+                            <td id="hotel-expense-standard" class="standard">450</td>
+                            <td class="cost"></td>
+                            <td class="standard">100</td>
+                            <td class="cost"></td>
+                            <td class="standard">100</td>
+                            <td class="cost"></td>
+                            <td class="cost"></td>
+                            <td class="cost"></td>
+                        </tr>
+                    </table>
+                    <button type="button" id="next-2-1" class="layui-btn ">填写交通费详单</button>
+                    <button type="button" id="back-2" class="layui-btn ">完成</button>
+
+                </div>
+
+                <div id="form-5">
+                    <h2>
+                        交通费报销
+                        <div>
+                            <button id="new-row-traffic" class="layui-btn">新增一行</button>
+                            <button id="remove-row-traffic" class="layui-btn">删除一行</button>
+                        </div>
+                    </h2>
+                    <table id="traffic">
+                        <tr>
+                            <th rowspan="2" colspan="1">用车人</th>
+                            <th rowspan="2" colspan="1">用车时间</th>
+                            <th rowspan="1" colspan="2">用车区间</th>
+                            <th rowspan="2" colspan="1">公里数</th>
+                            <th rowspan="2" colspan="1">用车原因</th>
+                        </tr>
+                        <tr>
+                            <th>出发</th>
+                            <th>到达</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <th rowspan="1" >合计</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                        </tr>
+                    </table>
+                    <h1>
+                        市内2元/公里,市外3元/公里（市外需要上传出差申请表，差旅证明附件）
+                    </h1>
+                    <div class="upload-btn">
+                        <span>上传图片</span>
+                        <input id="fileImage7" type="file" size="0" name="fileselect[]" multiple
+                            accept="image/jpeg,image/png" />
+                    </div>
+                    <button type="button" id="back-2-1" class="layui-btn ">完成</button>
+                </div>
+
+
+                <!-- 预览上传文件名 -->
+                <div id="preview" class="upload_preview">
+                    <div class="list-title">
+                        待上传文件列表
+                        <div id="close-list-btn">隐藏</div>
+                    </div>
+                    <div id="upload-list">
+                    </div>
+                </div>
+                <div id="show-list-btn">
+                    显示文件列表
                 </div>
             </div>
         </div>
+        </div>
     </main>
-    <script>
-         layui.use(['laydate','form','element'], function(){
-            var laydate = layui.laydate,
-            form = layui.form,
-            element = layui.element
-            
 
-            //监听提交
-            form.on('submit(formDemo)', function(data){
-                layer.msg(JSON.stringify(data.field));
-                return false;
-            });
+    <!-- 引入上传你文件库 -->
+    <script src="__PUBLIC__/static/lib/xqbUploadFile.js"></script>
+
+    <script>
+        // console.log()
+        layui.use(['layer', 'form','element','laydate','table'], function(){
+            var form = layui.form,
+                layer = layui.layer,
+                element = layui.element,
+                laydate = layui.laydate,
+                table = layui.table
             //执行一个laydate实例
             laydate.render({
-                elem: '#date' //指定元素
-            });
+                elem: '#date', //指定元素
+                min: -365,
+                max: 0
+            })
+            // layer.msg('Hello World');
         });
-        window.onload = function(){
 
+        // 差旅费合计函数
+        function caculate(){
+            var count = Number($('#trip-sum')['0'].innerText)
+            for(let i = 0; i < 9 ; i++){
+                let patten = /^[0-9]{0,8}$/
+                let num = $('.cost')[`${i}`].innerText
+                if(!(patten).test(num)){
+                    layer.msg('费用项含有非数字字符');
+                    return
+                }
+                count += Number(num)
+                // console.log(count)
+                // console.log(Number(num))
+            }
+            // 数据无误即可更新合计
+            $('#trip-sum')['0'].innerText = count
+        }
 
-            $('.menu-item').click(function(){
-                // $('#iframe')[0].src = this.children[1].id;
+        // 表格编辑
+        function bindTd (){
+            
+                // 级别选择
+                $("#level-select").change(function(){
+                    // 下标是1，则为教师级别
+                    if(($(this)['0'].value) === '1'){
+                        console.log($("#hotel-expense-standard"))
+                        $("#hotel-expense-standard").html('450')
+                    }else{
+                        // 其他下标为正副院长级别
+                        $("#hotel-expense-standard").html('550')
+                    }
+                })
+
+                // 表格点击
+                $("td").click(function (event) {
+                    //  忽略掉不能做修改的几个格子，如标准，合计这些
+                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard'){
+                        return
+                    }
+                    
+                    if ($(this).children("input").length > 0){
+                        return false
+                    }
+                    var tdObj = $(this)
+                    var preText = tdObj.html()
+                    //得到当前文本内容
+                    var inputObj = $(`<textarea rows="4" cols="3" ></textarea>`)
+                    //创建一个文本框元素
+                    tdObj.html(""); //清空td中的所有元素
+                    inputObj
+                        .width(tdObj.width())
+                        //设置文本框宽度与td相同
+                        .height(tdObj.height())
+                        .css({ border: "0px", fontSize: "17px", font: "宋体" ,'text-align': 'center'})
+                        .val(preText)
+                        .appendTo(tdObj)
+                        //把创建的文本框插入到tdObj子节点的最后
+                        .trigger("focus")
+                        //用trigger方法触发事件
+                        .trigger("select")
+                    inputObj.keyup(function (event) {
+                        if (13 == event.which)
+                        //用户按下回车
+                        {
+                            var text = $(this).val();
+                            tdObj.html(text)
+                            caculate()
+
+                        }
+                        else if (27 == event.which)
+                        //ESC键
+                        {
+                            tdObj.html(preText)
+                        }
+                    })
+                    inputObj.blur(function(){
+                        var text = $(this).val()
+                        tdObj.html(text)
+                        caculate()
+                    })
+                    //已进入编辑状态后，不再处理click事件
+                    inputObj.click(function () {
+                        return false
+                    })
+                })
+            }
+        window.onload = function () {
+            bindTd()
+            $('.menu-item').click(function () {
                 location.href = this.children[1].id
             })
 
-
-            $('#next').click(()=>{
+            // 翻页按钮
+            $('#next-1').click(() => {
+                if($('#select option:selected').val() === '' || $('input[name="date"]').val() === ''){
+                    layer.msg('请填写日期和选择类型')
+                    return
+                }
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span class="current">所有报销</span>
+                `)
+                $("#form-1")[0].style.display = 'none'
+                $("#form-2")[0].style.display = 'block'
+            })
+            $('#next-2').click(() => {
                 // 切换到上传发票页面
                 // 修改内容
                 $("#header").html(`
                     <span>申请报表  > </span>
                     <span>选择类型  > </span>
-                    <span class="current">上传发票</span>
+                    <span>所有报销  > </span>
+                    <span class="current">差旅费</span>
                 `)
-                $("#form-1")[0].style.display = 'none'
-                $("#form-2")[0].style.display = 'block'
-
-                layui.use(['form', 'upload'], function(){
-                var form = layui.form,
-                upload = layui.upload
-
-                var uploadInst = upload.render({
-                    elem: '#upload' //绑定元素
-                    ,url: '/upload/' //上传接口
-                    ,done: function(res){
-                    //上传完毕回调
-                    }
-                    ,error: function(){
-                    //请求异常回调
-                    }
-                });
-                //监听提交
-                form.on('submit(formDemo)', function(data){
-                        layer.msg(JSON.stringify(data.field));
-                        return false;
-                    });
-                });
+                $("#form-2")[0].style.display = 'none'
+                $("#form-4")[0].style.display = 'block'
             })
-            $('#back').click(()=>{
+            $('#next-2-1').click(() => {
                 // 切换到上传发票页面
                 // 修改内容
-                $("#header").html(`申请报表 > <span class="current">选择类型</span>`)
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span>所有报销  > </span>
+                    <span>差旅费  > </span>
+                    <span class="current">交通费</span>
+                `)
+                $("#form-4")[0].style.display = 'none'
+                $("#form-5")[0].style.display = 'block'
+            })
+            $('#next-3').click(() => {
+                // 切换到上传发票页面
+                // 修改内容
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span>所有报销  > </span>
+                    <span class="current">固定资产费</span>
+                `)
+                $("#form-2")[0].style.display = 'none'
+                $("#form-3")[0].style.display = 'block'
+            })
+            
+            $('#back-1').click(() => {
+                $("#header").html(`
+                <span>申请报表  > </span> 
+                <span class="current">选择类型</span>`)
                 $("#form-1")[0].style.display = 'block'
                 $("#form-2")[0].style.display = 'none'
             })
+            $('#back-2').click(() => {
+                console.log('object');
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span class="current">所有报销</span>
+                `)
+                $("#form-4")[0].style.display = 'none'
+                $("#form-2")[0].style.display = 'block'
+            })
+            $('#back-2-1').click(() => {
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span>所有报销  > </span>
+                    <span class="current">差旅费</span>
+                `)
+                $("#form-5")[0].style.display = 'none'
+                $("#form-4")[0].style.display = 'block'
+            })
 
+            $('#back-3').click(() => {
+                $("#header").html(`
+                    <span>申请报表  > </span>
+                    <span>选择类型  > </span>
+                    <span class="current">所有报销</span>
+                `)
+                $("#form-3")[0].style.display = 'none'
+                $("#form-2")[0].style.display = 'block'
+            })
+            
+            // 新增行
+            $('#new-row-assets').click(()=>{
+                $('#assets').append(`
+                    <tr>
+                        <td>${$('#assets')['0'].childElementCount+1}</td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-assets-${$('#assets')['0'].childElementCount+1}"></td>
+                    </tr>
+                `)
+                // 拿到新一行中每个td
+                let  className = `.new-row-assets-${$('#assets')['0'].childElementCount}`
+                // 给每个td绑定事件
+                $(`${className}`).click(function (event) {
+                    //  忽略掉不能做修改的几个格子，如标准，合计这些
+                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard'){
+                        return
+                    }
+                    
+                    if ($(this).children("input").length > 0){
+                        return false
+                    }
+                    var tdObj = $(this)
+                    var preText = tdObj.html()
+                    //得到当前文本内容
+                    var inputObj = $(`<textarea rows="4" cols="3" ></textarea>`)
+                    //创建一个文本框元素
+                    tdObj.html(""); //清空td中的所有元素
+                    inputObj
+                        .width(tdObj.width())
+                        //设置文本框宽度与td相同
+                        .height(tdObj.height())
+                        .css({ border: "0px", fontSize: "17px", font: "宋体" ,'text-align': 'center'})
+                        .val(preText)
+                        .appendTo(tdObj)
+                        //把创建的文本框插入到tdObj子节点的最后
+                        .trigger("focus")
+                        //用trigger方法触发事件
+                        .trigger("select")
+                    inputObj.keyup(function (event) {
+                        if (13 == event.which)
+                        //用户按下回车
+                        {
+                            var text = $(this).val();
+                            tdObj.html(text)
+                            caculate()
+
+                        }
+                        else if (27 == event.which)
+                        //ESC键
+                        {
+                            tdObj.html(preText)
+                        }
+                    })
+                    inputObj.blur(function(){
+                        var text = $(this).val()
+                        tdObj.html(text)
+                        caculate()
+                    })
+                    //已进入编辑状态后，不再处理click事件
+                    inputObj.click(function () {
+                        return false
+                    })
+                })
+            })
+            $('#new-row-traffic').click(()=>{
+                $('#traffic').append(`
+                    <tr>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                        <td class="new-row-traffic-${$('#assets')['0'].childElementCount+1}"></td>
+                    </tr>
+                `)
+                // 拿到新一行中每个td
+                let  className = `.new-row-traffic-${$('#assets')['0'].childElementCount}`
+                // 给每个td绑定事件
+                $(`${className}`).click(function (event) {
+                    //  忽略掉不能做修改的几个格子，如标准，合计这些
+                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard'){
+                        return
+                    }
+                    
+                    if ($(this).children("input").length > 0){
+                        return false
+                    }
+                    var tdObj = $(this)
+                    var preText = tdObj.html()
+                    //得到当前文本内容
+                    var inputObj = $(`<textarea rows="4" cols="3" ></textarea>`)
+                    //创建一个文本框元素
+                    tdObj.html(""); //清空td中的所有元素
+                    inputObj
+                        .width(tdObj.width())
+                        //设置文本框宽度与td相同
+                        .height(tdObj.height())
+                        .css({ border: "0px", fontSize: "17px", font: "宋体" ,'text-align': 'center'})
+                        .val(preText)
+                        .appendTo(tdObj)
+                        //把创建的文本框插入到tdObj子节点的最后
+                        .trigger("focus")
+                        //用trigger方法触发事件
+                        .trigger("select")
+                    inputObj.keyup(function (event) {
+                        if (13 == event.which)
+                        //用户按下回车
+                        {
+                            var text = $(this).val();
+                            tdObj.html(text)
+                            caculate()
+
+                        }
+                        else if (27 == event.which)
+                        //ESC键
+                        {
+                            tdObj.html(preText)
+                        }
+                    })
+                    inputObj.blur(function(){
+                        var text = $(this).val()
+                        tdObj.html(text)
+                        caculate()
+                    })
+                    //已进入编辑状态后，不再处理click事件
+                    inputObj.click(function () {
+                        return false
+                    })
+                })
+            })
+
+            // 删除行
+            $('#remove-row-assets').click(function(){
+                if($('#assets')['0'].childElementCount === 1){
+                    layer.msg('只有一行了，不能再删除了喔')
+                    return
+                }
+                let lastIndex = $('#assets')['0'].childElementCount - 1
+                $('#assets')['0'].children[lastIndex].remove()
+            })
+            $('#remove-row-traffic').click(function(){
+                if($('#traffic')['0'].childElementCount === 1){
+                    layer.msg('只有一行了，不能再删除了喔')
+                    return
+                }
+                let lastIndex = $('#traffic')['0'].childElementCount - 1
+                $('#traffic')['0'].children[lastIndex].remove()
+            })
+            
         }
     </script>
 </body>
+
 </html>
