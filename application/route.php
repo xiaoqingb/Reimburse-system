@@ -23,6 +23,9 @@ return [
     'apply'=>'index/index/index',
     'applying'=>'index/index/applying',
     'applied'=>'index/index/applied',
-    'profile'=>'index/index/profile'
+    'profile'=>'index/index/profile',
 
+
+    'admin'=> 'index/index/admin_index',
+    'admin/form-detail' => 'index/index/admin_form_detail'
  ];

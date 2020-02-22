@@ -419,7 +419,7 @@
 
         // 差旅费合计函数
         function caculate(){
-            var count = Number($('#business-8')['0'].innerText)
+            var count = 0
             for(let i = 0; i < 9 ; i++){
                 let patten = /^[0-9]{0,8}$/
                 let num = $('.cost')[`${i}`].innerText
@@ -428,11 +428,10 @@
                     return
                 }
                 count += Number(num)
-                // console.log(count)
-                // console.log(Number(num))
             }
             // 数据无误即可更新合计
             $('#business-8')['0'].innerText = count
+            $(`input[name="expense-8"]`).val(count)
         }
 
         // 表格编辑
@@ -483,6 +482,9 @@
                         {
                             var text = $(this).val();
                             tdObj.html(text)
+                            if($(this)['0'].id === 'traffic-sum'){
+                                $('#business-18')['0'].innerHTML = text
+                            }
                             caculate()
 
                         }
@@ -495,6 +497,9 @@
                     inputObj.blur(function(){
                         var text = $(this).val()
                         tdObj.html(text)
+                        if($(this)['0'].id === 'traffic-sum'){
+                            $('#business-18')['0'].innerHTML = text
+                        }
                         caculate()
                     })
                     //已进入编辑状态后，不再处理click事件
@@ -743,20 +748,21 @@
 
             // 删除行
             $('#remove-row-assets').click(function(){
-                if($('#assets')['0'].childElementCount === 1){
+                if($('.assets-item').length/18 === 1){
                     layer.msg('只有一行了，不能再删除了喔')
                     return
                 }
-                let lastIndex = $('#assets')['0'].childElementCount - 1
-                $('#assets')['0'].children[lastIndex].remove()
+                let lastIndex = $('.assets-item').length/18
+                console.log($($('#assets').get(0).childNodes[1]).get(0).children)
+                $($('#assets').get(0).childNodes[1]).get(0).children[lastIndex].remove()
             })
             $('#remove-row-traffic').click(function(){
-                if($('#traffic')['0'].childElementCount === 1){
+                if($('.traffic-item').length/6 === 1){
                     layer.msg('只有一行了，不能再删除了喔')
                     return
                 }
-                let lastIndex = $('#traffic')['0'].childElementCount - 1
-                $('#traffic')['0'].children[lastIndex].remove()
+                let lastIndex = $('.traffic-item').length/6
+                $($('#traffic').get(0).childNodes[1]).get(0).children[lastIndex+1].remove()
             })
             
         }

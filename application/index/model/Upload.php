@@ -5,5 +5,5 @@ use think\Model;
 
 class Upload extends Model
 {
-    protected $table = 'forms';
+    protected $table = 'images';
 }
