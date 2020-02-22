@@ -196,4 +196,36 @@ class Form extends Controller
             ]
         );
     }
+
+    public function getFormDetail(){
+        $id = input('get.id');
+        $form = new FormModel();
+        $formItem = $form->where('id', $id)->find();
+        $basicData=[
+            "id"=>$formItem->id,
+            "date"=>$formItem->date,
+            "name"=>$formItem->name,
+            "type"=>$formItem->type,
+            "office"=>$formItem->office,
+            "entertain"=>$formItem->entertain,
+            "meeting"=>$formItem->meeting,
+            "train"=>$formItem->train,
+            "activity"=>$formItem->activity,
+            "competition"=>$formItem->competition,
+            "material"=>$formItem->material,
+            "travel"=>$formItem->travel,
+            "assets"=>$formItem->assets,
+            "status"=>$formItem->status,
+        ];
+
+        return json_encode(
+            [
+                'code' => '0000',
+                'msg' => '获取成功',
+                "data" => [
+                    'basicData' => $basicData
+                ]
+            ]
+        );
+    }
 }

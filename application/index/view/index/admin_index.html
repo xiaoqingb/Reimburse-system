@@ -78,15 +78,11 @@
         </div>
     </main>
 
-    <!-- 引入上传你文件库 -->
-    <script src="__PUBLIC__/static/lib/xqbUploadFile.js"></script>
-
     <script>
-        // console.log($('#forms').get(0))
         $('#forms').click(function($event){
             if($($event.target).get(0).className === 'check-detail'){
                 let id = $($($event.target).get(0)).data('id')
-                location.href = 'admin/form-detail?=1'
+                location.href = `admin/form-detail?id=${id}`
             }
         })
         window.onload = function () {

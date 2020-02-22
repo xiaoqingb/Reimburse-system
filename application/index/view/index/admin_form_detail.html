@@ -54,6 +54,7 @@
                 <span class="current">表单详情</span>
             </div>
             <div id="content">
+                
                 <table id="forms">
                     <tr>
                         <th>时间</th>
@@ -72,48 +73,71 @@
                         <th>操作</th>
                     </tr>
                 </table>
+                <ul id="detail-menu" class="layui-nav" >
+                    <li class="layui-nav-item layui-this"><a >差旅费详情</a></li>
+                    <li class="layui-nav-item"><a >固定资产费详情</a></li>
+                    <li class="layui-nav-item"><a >图片清单</a></li>
+                </ul>
             </div>
         </div>
         </div>
     </main>
 
-    <!-- 引入上传你文件库 -->
-    <script src="__PUBLIC__/static/lib/xqbUploadFile.js"></script>
 
     <script>
         console.log($('#forms').get(0))
+        layui.use('element', function(){
+            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+            
+            //监听导航点击
+            element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });
+        });
         window.onload = function () {
+            let id = decodeURIComponent(/(id)=([0-9]*)/.exec(location.search)[2]) ;
+            console.log(id)
             $.ajax({
-                url: '__PUBLIC__/index/Form/getFormList',
+                url: '__PUBLIC__/index/Form/getFormDetail',
+                data:{
+                    id: id
+                },
                 type: 'get',
                 success:function (response) {
                     response = JSON.parse(response)
                     console.log(response)
-                    let forms = response.data.forms
-                    forms.forEach(element => {
+                    let form = response.data.basicData
+                    let type = [
+                        '质量工程',
+                        '学术讲座',
+                        '专业建设活动',
+                        '实习基地扩展',
+                        '实践教学经费',
+                        '学生活动经费',
+                    ]
                         $($('#forms').get(0).childNodes[1]).append(`
                             <tr>
-                                <td>${element.date}</td>
-                                <td>${element.name}</td>
-                                <td>${element.type}</td>
-                                <td>${element.office}</td>
-                                <td>${element.entertain}</td>
-                                <td>${element.meeting}</td>
-                                <td>${element.train}</td>
-                                <td>${element.activity}</td>
-                                <td>${element.competition}</td>
-                                <td>${element.material}</td>
-                                <td>${element.travel}</td>
-                                <td>${element.assets}</td>
+                                <td>${form.date}</td>
+                                <td>${form.name}</td>
+                                <td>${type[form.type - 1]}</td>
+                                <td>${form.office}</td>
+                                <td>${form.entertain}</td>
+                                <td>${form.meeting}</td>
+                                <td>${form.train}</td>
+                                <td>${form.activity}</td>
+                                <td>${form.competition}</td>
+                                <td>${form.material}</td>
+                                <td>${form.travel}</td>
+                                <td>${form.assets}</td>
                                 <td>待审核</td>
                                 <td>
-                                    <button class="check-detail" data-id="${element.id}">详情<button>
                                     <button>批准<button>
+                                    <button>拒绝<button>
                                 </td>
                             </tr>
                         `)
                         
-                    });
                 }
             })
         }
