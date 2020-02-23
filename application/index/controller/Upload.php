@@ -3,7 +3,7 @@ namespace app\index\controller;
 use think\Controller;
 
 use app\index\model\Upload as UploadModel;
-
+use  app\index\model\Form as FormModel;
 class Upload extends Controller
 {
     public function uploadImg(){
@@ -21,11 +21,11 @@ class Upload extends Controller
                 $name_path =str_replace('\\',"/",$info->getSavename());
                 $result["code"] = '0000';
                 $result["msg"] = '上传成功';
-                $result['data'] = "uploads/editor/".$name_path;
                 $upload = new UploadModel();
-                $upload -> timeStamp = $timeStamp;
+                $formId = FormModel::where('time_stamp',$timeStamp)->find()->id;
+                $upload -> form_id = $formId;
                 $upload -> name = $filename;
-                $upload -> url = "uploads/editor/".$name_path;
+                $upload -> url =  '/uploads/'.date(("Ymd")).'/'.$info->getSavename();
                 $result = $upload -> save();
                 return json_encode(
                     [

@@ -36,7 +36,7 @@
             <ul class="">
                 <li class="menu-item bg-dark">
                     <div class="hover-label"></div>
-                    <a id="apply">审核列表</a>
+                    <a href="admin">审核列表</a>
                 </li>
                 <li class="menu-item">
                     <div class="hover-label"></div>
@@ -50,7 +50,7 @@
         </div>
         <div id="page">
             <div id="header">
-                <span>申请列表  ></span>
+                <span><a href="admin">申请列表  ></a></span>
                 <span class="current">表单详情</span>
             </div>
             <div id="content">
@@ -74,10 +74,19 @@
                     </tr>
                 </table>
                 <ul id="detail-menu" class="layui-nav" >
-                    <li class="layui-nav-item layui-this"><a >差旅费详情</a></li>
-                    <li class="layui-nav-item"><a >固定资产费详情</a></li>
-                    <li class="layui-nav-item"><a >图片清单</a></li>
+                    <li class="layui-nav-item layui-this">
+                        <a data-detail='businessTravel'>差旅费详情</a>
+                    </li>
+                    <li class="layui-nav-item" >
+                        <a data-detail='assets'>固定资产费详情</a>
+                    </li>
+                    <li class="layui-nav-item" >
+                        <a data-detail='images'>图片清单</a>
+                    </li>
                 </ul>
+                <div id="detail">
+                    
+                </div>
             </div>
         </div>
         </div>
@@ -85,19 +94,32 @@
 
 
     <script>
-        console.log($('#forms').get(0))
-        layui.use('element', function(){
-            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
-            
-            //监听导航点击
-            element.on('nav(demo)', function(elem){
-                //console.log(elem)
-                layer.msg(elem.text());
-            });
+        layui.use(['element','layer'], function(){
+            var element = layui.element,
+            layer = layui.layer
         });
+        $('#forms').click(function($event){
+            // 批准
+            if($($event.target).get(0).className === 'approve'){
+                if(confirm('确定批准该表单吗')){
+                    $.ajax({
+                        url: '__PUBLIC__/index/Form/approveForm',
+                        type: 'post',
+                        data: {
+                            id: $($($event.target).get(0)).data('id')
+                        },
+                        success:function(){
+                            console.log('object')
+                        }
+                    })
+                }else{
+                    layer.msg('您取消了批准操作')
+                }
+                
+            }
+        })
         window.onload = function () {
             let id = decodeURIComponent(/(id)=([0-9]*)/.exec(location.search)[2]) ;
-            console.log(id)
             $.ajax({
                 url: '__PUBLIC__/index/Form/getFormDetail',
                 data:{
@@ -106,7 +128,6 @@
                 type: 'get',
                 success:function (response) {
                     response = JSON.parse(response)
-                    console.log(response)
                     let form = response.data.basicData
                     let type = [
                         '质量工程',
@@ -132,14 +153,272 @@
                                 <td>${form.assets}</td>
                                 <td>待审核</td>
                                 <td>
-                                    <button>批准<button>
-                                    <button>拒绝<button>
+                                    <button class="approve">批准</button>
+                                    <button>不批准</button>
                                 </td>
                             </tr>
                         `)
-                        
+                }
+
+            })
+            let getDetail = {
+                businessTravel: ()=>{
+                    $.ajax({
+                        url:'__PUBLIC__/index/Form/getFormBusinessTravel',
+                        type: 'get',
+                        data:{
+                            id
+                        },
+                        success:(response)=>{
+                            response = JSON.parse(response)
+                            if(response.code !== '0000'){
+                                $('#detail').html('该表单没有差旅费详情')
+                                return
+                            }
+                            console.log(response.data);
+                            let basicData = response.data.basicData
+                            let detailList = response.data.detailList
+                            let html = `
+                                <table>
+                                    <tr>
+                                        <th colspan="10">基本信息</th>
+                                    </tr>
+                                    <tr>
+                                        <th rowspan="2">出差人</th>
+                                        <th rowspan="2">级别</th>
+                                        <th rowspan="2">出差事由</th>
+                                        <th rowspan="1" colspan="2">出发时间(年-月-日)</th>
+                                        <th rowspan="1" colspan="2">出差地点</th>
+                                        <th rowspan="2">费用合计</th>
+                                    </tr>
+                                    <tr>
+                                        <th rowspan="1">开始</th>
+                                        <th rowspan="1">结束</th>
+                                        <th rowspan="1">出发</th>
+                                        <th rowspan="1">到达</th>
+                                    </tr>
+                                    <tr>
+                                        <td id="business-1">${basicData.name}</td>
+                                        <td id="level">
+                                            ${basicData.level === 1 ? '老师' : basicData.level === 2 ? '副院长' : '院长'}
+                                        </td>
+                                        <td id="business-3">${basicData.reason}</td>
+                                        <td id="business-4">${basicData.begin_time}</td>
+                                        <td id="business-5">${basicData.end_time}</td>
+                                        <td id="business-6">${basicData.begin_place}</td>
+                                        <td id="business-7">${basicData.arrive_place}</td>
+                                        <td id="business-8" class="standard">${basicData.sum}</td>
+                                    </tr>
+                                </table>
+                                <table>
+                                    <tr>
+                                        <th colspan="12">费用支出明细</th>
+                                    </tr>
+                                    <tr>
+                                        <th rowspan="1" colspan="4">城市间交通费</th>
+                                        <th rowspan="1" colspan="2">住宿费</th>
+                                        <th rowspan="1" colspan="2">伙食补助费</th>
+                                        <th rowspan="1" colspan="2">市内交通费</th>
+                                        <th rowspan="2" colspan="1">培训费</th>
+                                        <th rowspan="2" colspan="1">其他</th>
+                                    </tr>
+                                    <tr>
+                                        <th rowspan="1">火车</th>
+                                        <th rowspan="1">飞机</th>
+                                        <th rowspan="1">汽车</th>
+                                        <th rowspan="1">其他</th>
+                                        <th rowspan="1">标准</th>
+                                        <th rowspan="1">费用</th>
+                                        <th rowspan="1">标准</th>
+                                        <th rowspan="1">费用</th>
+                                        <th rowspan="1">标准</th>
+                                        <th rowspan="1">费用</th>
+                                    </tr>
+                                    <tr>
+                                        <td  id="business-9" class="cost">${basicData.train}</td>
+                                        <td  id="business-10" class="cost">${basicData.plane}</td>
+                                        <td  id="business-11" class="cost">${basicData.bus}</td>
+                                        <td  id="business-12" class="cost">${basicData.other_tools}</td>
+                                        <td id="business-13" class="standard">${basicData.accommodation_standard}</td>
+                                        <td id="business-14" class="cost">${basicData.accommodation_expense}</td>
+                                        <td id="business-15" class="standard">${basicData.food_standard}</td>
+                                        <td id="business-16" class="cost">${basicData.food_expense}</td>
+                                        <td id="business-17" class="standard">${basicData.traffic_standard}</td>
+                                        <td  id="business-18" class="cost">${basicData.traffic_expend}</td>
+                                        <td  id="business-19" class="cost">${basicData.	train_expense}</td>
+                                        <td  id="business-20" class="cost">${basicData.other}</td>
+                                    </tr>
+                                </table>`
+                            if(detailList){
+                                console.log('object');
+                                html += `<table id="traffic">
+                                        <tr>
+                                            <th rowspan="2" colspan="1">用车人</th>
+                                            <th rowspan="2" colspan="1">用车时间</th>
+                                            <th rowspan="1" colspan="2">用车区间</th>
+                                            <th rowspan="2" colspan="1">公里数</th>
+                                            <th rowspan="2" colspan="1">用车原因</th>
+                                        </tr>
+                                        <tr>
+                                            <th>出发</th>
+                                            <th>到达</th>
+                                        </tr>`
+                                detailList.forEach(element => {
+                                    html += `
+                                        <tr>
+                                            <td class="traffic-item">${element.name}</td>
+                                            <td class="traffic-item">${element.time}</td>
+                                            <td class="traffic-item">${element.begin_place}</td>
+                                            <td class="traffic-item">${element.arrive_place}</td>
+                                            <td class="traffic-item">${element.kilometre}</td>
+                                            <td class="traffic-item">${element.reason}</td>
+                                        </tr>
+                                    `
+                                });
+                                html += `</table>`        
+                            }
+                            
+                            $('#detail').html(html)
+                        }
+                    })
+                },
+                assets: ()=>{
+                    $.ajax({
+                        url:'__PUBLIC__/index/Form/getFormAssets',
+                        type: 'get',
+                        data:{
+                            id
+                        },
+                        success:(response)=>{
+                            response = JSON.parse(response)
+                            if(response.code !== '0000'){
+                                $('#detail').html('该表单没有固定资产费详情')
+                                return
+                            }
+                            let html = `
+                                <table id="assets">
+                                    <tr>
+                                        <th>id</th>
+                                        <th>资产名称</th>
+                                        <th>型号</th>
+                                        <th>规格</th>
+                                        <th>品牌</th>
+                                        <th>单价</th>
+                                        <th>数量</th>
+                                        <th>金额</th>
+                                        <th>经费科目</th>
+                                        <th>来源</th>
+                                        <th>使用方向</th>
+                                        <th>存放地点</th>
+                                        <th>供应商</th>
+                                        <th>生产厂家</th>
+                                        <th>购置日期</th>
+                                        <th>发票号</th>
+                                        <th>合同号</th>
+                                        <th>采购单</th>
+                                        <th>对应采购数量</th>
+                                    </tr>
+                            `;
+                            response.data.forEach((element,index) => {
+                                html += `
+                                <tr>
+                                    <td>${index +1}</td>
+                                    <td class="assets-item">${element.assets_name}</td>
+                                    <td class="assets-item">${element.type}</td>
+                                    <td class="assets-item">${element.specification}</td>
+                                    <td class="assets-item">${element.brand}</td>
+                                    <td class="assets-item">${element.price}</td>
+                                    <td class="assets-item">${element.num}</td>
+                                    <td class="assets-item">${element.money}</td>
+                                    <td class="assets-item">${element.subject}</td>
+                                    <td class="assets-item">${element.source}</td>
+                                    <td class="assets-item">${element.use_direction}</td>
+                                    <td class="assets-item">${element.storage_location}</td>
+                                    <td class="assets-item">${element.supplier}</td>
+                                    <td class="assets-item">${element.manufacturer}</td>
+                                    <td class="assets-item">${element.buy_time}</td>
+                                    <td class="assets-item">${element.invoice_num}</td>
+                                    <td class="assets-item">${element.contract_num}</td>
+                                    <td class="assets-item">${element.purchase_order}</td>
+                                    <td class="assets-item">${element.puerchase_num}</td>
+                                </tr>
+                                `
+                            });
+                            html += `</table>`
+                            
+                            $('#detail').html(html)
+                        }
+                    })
+                },
+                images: ()=>{
+                    $.ajax({
+                        url:'__PUBLIC__/index/Form/getFormImages',
+                        type: 'get',
+                        data:{
+                            id
+                        },
+                        success:(response)=>{
+                            response = JSON.parse(response)
+                            console.log(response);
+                            if(response.code !== '0000'){
+                                $('#detail').html('该表单没有上传图片')
+                                return
+                            }
+                            let html = ''
+                            response.data.forEach(element => {
+                                html += (`
+                                    <div class="img-item">
+                                        <img src="__PUBLIC__${element.imgUrl}" />
+                                        <p>${element.name}</p>
+                                    </div>
+                                `)
+                            });
+                            $('#detail').html(html)
+                        }
+                    })
+                }
+            }
+            $('#detail-menu').click(function($event){
+                let detail = $($event.target).data('detail')
+                if(detail !== ''){
+                    getDetail[`${detail}`]()
                 }
             })
+            $('#detail').click(function($event){
+                let src = $($event.target).get(0).currentSrc
+                if(!src){
+                    return
+                }
+                $('body').append(`
+                    <div id="black-bg">
+                        <img id="img-show"  src="${src}" style="height:" />
+                        <div id="enlarge">+</div>
+                        <div id="narrow" class="narrow">
+                            <div class="narrow"></div>    
+                        </div>
+                    </div>
+                `)
+                $('#img-show').get(0).height = 500;
+                // 初始化图片高度
+                $('#black-bg').click(function($envent){
+                    let changeSize = 50
+                    if($envent.target.id === 'black-bg'){
+                        this.remove()
+                        return
+                    }
+                    else if($envent.target.id === 'enlarge'){
+                        if($('#img-show').get(0).height >= window.outerWidth){
+                            return
+                        }
+                        $('#img-show').get(0).height = $('#img-show').get(0).height +changeSize > 200 ? $('#img-show').get(0).height +changeSize : $('#img-show').get(0).height 
+                    }
+                    else if($envent.target.className === 'narrow'){
+
+                        $('#img-show').get(0).height = $('#img-show').get(0).height -changeSize > 200 ? $('#img-show').get(0).height -changeSize : $('#img-show').get(0).height
+                    }
+                })
+            })
+            getDetail[`businessTravel`]()
         }
     </script>
 </body>

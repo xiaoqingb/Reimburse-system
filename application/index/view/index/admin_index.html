@@ -54,51 +54,62 @@
                 <span class="current">申请列表</span>
             </div>
             <div id="content">
-                <table id="forms">
-                    <tr>
-                        <th>时间</th>
-                        <th>姓名</th>
-                        <th>类型</th>
-                        <th>办公费</th>
-                        <th>招待费</th>
-                        <th>会议费</th>
-                        <th>培训费</th>
-                        <th>学生活动费</th>
-                        <th>学生竞赛费</th>
-                        <th>材料物料费</th>
-                        <th>差旅费</th>
-                        <th>固定资产费</th>
-                        <th>状态</th>
-                        <th>操作</th>
-                    </tr>
-                    
-                </table>
+                <div id="form-container"></div>
+                <div id="demo0"></div>
             </div>
         </div>
         </div>
     </main>
 
     <script>
-        $('#forms').click(function($event){
-            if($($event.target).get(0).className === 'check-detail'){
-                let id = $($($event.target).get(0)).data('id')
-                location.href = `admin/form-detail?id=${id}`
-            }
-        })
-        window.onload = function () {
+        const type = [
+            '质量工程',
+            '学术讲座',
+            '专业建设活动',
+            '实习基地扩展',
+            '实践教学经费',
+            '学生活动经费',
+        ]
+        
+        function getFormList(page = 1){
             $.ajax({
                 url: '__PUBLIC__/index/Form/getFormList',
                 type: 'get',
+                data:{
+                    page
+                },
                 success:function (response) {
                     response = JSON.parse(response)
-                    console.log(response)
+                    if(response.code !== '0000'){
+                        $('#form-container').html('当前没有人申请')
+                        return
+                    }
                     let forms = response.data.forms
+                    let html = `
+                    <table id="forms">
+                        <tr>
+                            <th>时间</th>
+                            <th>姓名</th>
+                            <th>类型</th>
+                            <th>办公费</th>
+                            <th>招待费</th>
+                            <th>会议费</th>
+                            <th>培训费</th>
+                            <th>学生活动费</th>
+                            <th>学生竞赛费</th>
+                            <th>材料物料费</th>
+                            <th>差旅费</th>
+                            <th>固定资产费</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    `
                     forms.forEach(element => {
-                        $($('#forms').get(0).childNodes[1]).append(`
+                        html += `
                             <tr>
                                 <td>${element.date}</td>
                                 <td>${element.name}</td>
-                                <td>${element.type}</td>
+                                <td>${type[element.type - 1]}</td>
                                 <td>${element.office}</td>
                                 <td>${element.entertain}</td>
                                 <td>${element.meeting}</td>
@@ -107,18 +118,176 @@
                                 <td>${element.competition}</td>
                                 <td>${element.material}</td>
                                 <td>${element.travel}</td>
-                                <td>${element.assets}</td>
+                                <td>${element.assets}sssssss</td>
                                 <td>待审核</td>
                                 <td>
-                                    <button class="check-detail" data-id="${element.id}">详情<button>
-                                    <button>批准<button>
+                                    <button class="check-detail" data-id="${element.id}">sss详情</button>
+                                    <button class="approve" data-id="${element.id}">批准</button>
+                                    <button class="reject" data-id="${element.id}">不批准</button>
                                 </td>
                             </tr>
-                        `)
-                        
-                    });
+                    `})
+                    html += `</table>`
+                    $('#form-container').html(html)
                 }
             })
+        }
+        
+        window.onload = function () {
+            let p1 = function (){
+                return new Promise(function(resolve,reject){
+                    $.ajax({
+                        url: '__PUBLIC__/index/Form/getFormList',
+                        type: 'get',
+                        data:{
+                            page : 1
+                        },
+                        success:function (response) {
+                            response = JSON.parse(response)
+                            if(response.code !== '0000'){
+                                $('#form-container').html('当前没有人申请')
+                                return
+                            }
+                            let forms = response.data.forms
+                            let html = `
+                                <table id="forms">
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>姓名</th>
+                                        <th>类型</th>
+                                        <th>办公费</th>
+                                        <th>招待费</th>
+                                        <th>会议费</th>
+                                        <th>培训费</th>
+                                        <th>学生活动费</th>
+                                        <th>学生竞赛费</th>
+                                        <th>材料物料费</th>
+                                        <th>差旅费</th>
+                                        <th>固定资产费</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                            `
+                            forms.forEach(element => {
+                                html += `
+                                    <tr>
+                                        <td>${element.date}</td>
+                                        <td>${element.name}</td>
+                                        <td>${type[element.type - 1]}</td>
+                                        <td>${element.office}</td>
+                                        <td>${element.entertain}</td>
+                                        <td>${element.meeting}</td>
+                                        <td>${element.train}</td>
+                                        <td>${element.activity}</td>
+                                        <td>${element.competition}</td>
+                                        <td>${element.material}</td>
+                                        <td>${element.travel}</td>
+                                        <td>${element.assets}</td>
+                                        <td>待审核</td>
+                                        <td>
+                                            <button class="check-detail" data-id="${element.id}">详情</button>
+                                            <button class="approve" data-id="${element.id}">批准</button>
+                                            <button class="reject" data-id="${element.id}">不批准</button>
+                                        </td>
+                                    </tr>
+                            `})
+                            html += `</table>`
+                            $('#form-container').html(html)
+                            return resolve(response.data.pageCount)
+                        }
+                    })
+                })
+            }
+            p1().then((pageCount = 1)=>{
+                layui.use(['laypage', 'layer'], function(){
+                    var laypage = layui.laypage
+                    ,layer = layui.layer
+                    
+                    //总页数低于页码总数
+                    laypage.render({
+                        elem: 'demo0',
+                        limit: 3
+                        ,count: 3*pageCount //数据总数
+                        ,jump: function(obj, first){
+                            if(!first){
+                                getFormList(obj.curr)
+                            }
+                        }
+                    });
+                })
+
+                $('#form-container').click(function($event){
+                    // 跳转详情页
+                    if($($event.target).get(0).className === 'check-detail'){
+                        let id = $($($event.target).get(0)).data('id')
+                        location.href = `admin-form-detail?id=${id}`
+                    }
+                    // 批准
+                    if($($event.target).get(0).className === 'approve'){
+                        let tr = $($($event.target).get(0).parentElement.parentElement)
+                        if(confirm('确定批准该表单吗')){
+                            $.ajax({
+                                url: '__PUBLIC__/index/Form/approveForm',
+                                type: 'post',
+                                data: {
+                                    id: $($($event.target).get(0)).data('id')
+                                },
+                                success:function(response){
+                                    response= JSON.parse(response)
+                                    if(response.code !== '0000'){
+                                        layer.msg('批准失败，请联系管理员')
+                                        return
+                                    }
+                                    layer.msg('批准成功')
+                                    tr.remove()
+                                }
+                            })
+                        }else{
+                            layer.msg('您取消了操作')
+                        }
+                    }
+                    if($($event.target).get(0).className === 'reject'){
+                        let tr = $($($event.target).get(0).parentElement.parentElement)
+                        $('body').append(`
+                            <div id="black-bg">
+                                <div id='reject-window'>
+                                    <h2>请填写理由</h2>
+                                    <textarea id = "reason" style="width:300px;"></textarea>
+                                    <button id="submit">确认</button>
+                                    <button id="cancel">取消</button>
+                                <div>
+                            </div>
+                        `)
+                        $('#cancel').click(function(){
+                            $('#black-bg').remove()
+                        })
+                        $('#submit').click(function(){
+                            console.log($('#reason').get(0).value)
+                            $.ajax({
+                                url: '__PUBLIC__/index/Form/rejectForm',
+                                type: 'post',
+                                data: {
+                                    reason: $('#reason').get(0).value,
+                                    id: $($($event.target).get(0)).data('id')
+                                },
+                                success:function(response){
+                                    response= JSON.parse(response)
+                                    if(response.code !== '0000'){
+                                        layer.msg('操作失败，请联系管理员')
+                                        $('#black-bg').get(0).remove()
+                                        return
+                                    }
+                                    layer.msg('成功不批准')
+                                    $('#black-bg').get(0).remove()
+                                    tr.remove()
+
+                                }
+                            })
+                        })
+                    }
+                })
+            })
+            
         }
     </script>
 </body>

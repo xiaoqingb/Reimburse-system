@@ -2,13 +2,16 @@
 namespace app\index\controller;
 use app\index\model\Assets;
 use app\index\model\BusinessTravel;
+use app\index\model\result;
 use app\index\model\TrafficDetail;
 use think\Controller;
 
 use app\index\model\Form as FormModel;
+use app\index\model\Upload as UploadModel;
 
 class Form extends Controller
 {
+    // 前台
     public function addForm(){
         // 日期
         $date = input('post.date');
@@ -37,6 +40,8 @@ class Form extends Controller
         $form = new FormModel();
         $form->date = $date;
         $form->type = $type;
+        $form->name = '王老师';
+        $form-> next_manage= '0';
         $form->time_stamp = $timeStamp;
         $form->office = $expense[0];
         $form->entertain = $expense[1];
@@ -86,15 +91,14 @@ class Form extends Controller
             $assets->puerchase_num  = $assetsItem->value_17;
             $assets->save();
         }
-        // $assets->form_id = $
-        $businessTravelData = input('post.businessTravel');
-        $businessTravelData = json_decode($businessTravelData);
+        $resultData = input('post.businessTravel');
+        $resultData = json_decode($resultData);
         // 合计不为零才要录入
-        if($businessTravelData->basic->header[7] !== '0'){
+        if($resultData->basic->header[7] !== '0'){
             $businessTravel = new BusinessTravel();
-            $header = $businessTravelData->basic->header;
-            $body = $businessTravelData->basic->body;
-            $traficDetail = $businessTravelData->detail;
+            $header = $resultData->basic->header;
+            $body = $resultData->basic->body;
+            $detail = $resultData->detail;
             $businessTravel->form_id = $formId;
 
             // 插入表头数据
@@ -121,7 +125,7 @@ class Form extends Controller
             $businessTravel->train_expense = $body[10];
             $businessTravel->other = $body[11];
             $businessTravel->save();
-            foreach ($traficDetail as $traficDetailItem){
+            foreach ($detail as $traficDetailItem){
                 $traficDetail = new TrafficDetail();
                 if($traficDetailItem->value_0 !== ''){
                     $traficDetail->form_id = $formId;
@@ -143,6 +147,8 @@ class Form extends Controller
 
     }
 
+
+    // 后台
     public function getFormList(){
         $page = input("get.page","1");
         //step 1.格式化数据
@@ -150,7 +156,7 @@ class Form extends Controller
 
         //step 2. 计算分页
         $form = new FormModel();
-        $pageSize=7;
+        $pageSize=3;
         $totalCount=$form->count();
         $pageCount=ceil($totalCount/$pageSize);
 
@@ -228,4 +234,169 @@ class Form extends Controller
             ]
         );
     }
+
+    public  function getFormBusinessTravel(){
+        $formId = input('get.id');
+        $result = new BusinessTravel();
+        $result = $result->where('form_id', $formId)->find();
+        if(!$result){
+            return json_encode([
+                'code'=> '0001',
+                'msg' => '该表单没有填写差旅费详情'
+            ]);
+        }
+        $basicData = [
+            'name'=>$result->name,
+            'level'=>$result->level,
+            'reason'=>$result->reason,
+            'begin_time'=>$result->begin_time ,
+            'end_time'=>$result->end_time,
+            'begin_place'=>$result->begin_place,
+            'arrive_place'=>$result->arrive_place,
+            'train'=>$result->sum ,
+            'plane'=>$result->sum ,
+            'bus'=>$result->sum ,
+            'other_tools'=>$result->sum ,
+            'accommodation_standard'=>$result->sum ,
+            'accommodation_expense'=>$result->sum ,
+            'food_standard'=>$result->sum ,
+            'food_expense'=>$result->sum ,
+            'traffic_standard'=>$result->sum ,
+            'traffic_expend'=>$result->sum ,
+            'train_expense'=>$result->train_expense ,
+            'other'=>$result->sum ,
+            'sum'=>$result->sum
+        ];
+        $trafic = new TrafficDetail();
+        $traficDetail = $trafic->where('form_id',$formId)->select();
+        if (!$traficDetail){
+            return json_encode([
+                'code'=> '0000',
+                'msg' => '获取成功',
+                'data' => [
+                    'basicData'=> $basicData
+                ]
+            ]);
+        }
+        $detailList = [];
+        foreach ($traficDetail as $traficDetailItem) {
+            array_push($detailList,[
+                'form_id'=>$traficDetailItem->form_id,
+                'name'=>$traficDetailItem->name,
+                'time'=>$traficDetailItem->time,
+                'begin_place'=>$traficDetailItem->begin_place,
+                'arrive_place'=>$traficDetailItem->arrive_place,
+                'kilometre'=>$traficDetailItem->kilometre,
+                'reason'=>$traficDetailItem->reason,
+            ]);
+        }
+        return json_encode([
+            'code'=> '0000',
+            'msg' => '获取成功',
+            'data' => [
+                'basicData'=> $basicData,
+                'detailList'=>$detailList
+            ]
+        ]);
+    }
+
+    public  function getFormAssets(){
+        $formId = input('get.id');
+        $Assets = new Assets();
+        $assetsList = $Assets->where('form_id', $formId)->select();
+        if(!$assetsList){
+            return json_encode([
+                'code'=> '0001',
+                'msg' => '该表单没有填写固定资产费详情'
+            ]);
+        }
+        $data= [];
+        foreach($assetsList as $assetsItem){
+            array_push($data,[
+                "assets_name"=>$assetsItem->assets_name,
+                "type"=>$assetsItem->type,
+                "specification"=>$assetsItem->specification,
+                "brand"=>$assetsItem->brand,
+                "price"=>$assetsItem->price,
+                "num"=>$assetsItem->num,
+                "money"=>$assetsItem->money,
+                "subject"=>$assetsItem->subject,
+                "source"=>$assetsItem->source,
+                "use_direction"=>$assetsItem->use_direction,
+                "storage_location"=>$assetsItem->storage_location,
+                "supplier"=>$assetsItem->supplier,
+                "manufacturer"=>$assetsItem->manufacturer,
+                "buy_time"=>$assetsItem->buy_time,
+                "invoice_num"=>$assetsItem->invoice_num,
+                "contract_num"=>$assetsItem->contract_num,
+                "purchase_order"=>$assetsItem->purchase_order,
+                "puerchase_num"=>$assetsItem->puerchase_num
+            ]);
+        }
+        return json_encode([
+            'code'=> '0000',
+            'msg' => '获取成功',
+            'data' => $data
+        ]);
+    }
+
+    public function getFormImages(){
+        $formId = input('get.id');
+        $result = UploadModel::where('form_id',$formId)->select();
+        if(!$result){
+            return json_encode([
+                'code'=> '0001',
+                'msg' => '该表单没有上传图片'
+            ]);
+        }
+        $images = [];
+        foreach ($result as $image){
+            array_push($images,[
+                'name'=> $image->name,
+                'imgUrl' =>$image->url
+            ]);
+        }
+        return json_encode([
+             'code'=> '0000',
+             'msg' => '获取图片列表成功',
+             'data'=>$images
+        ]);
+    }
+
+    public function rejectForm(){
+        $formId = input('post.id');
+        $reason = input('post.reason');
+        $form = new FormModel();
+        $result = $form->where('id',$formId)->update(['status' => '2', 'reason'=>$reason]);
+        // if($result){
+        //     return json_encode([
+        //         'code'=>'0001',
+        //         'msg' =>'操作失败'
+        //     ]);
+        // }
+        return json_encode([
+            'code'=>'0000',
+            'msg' =>'操作成功'
+        ]);
+    }
+
+    public function approveForm(){
+        $formId = input('post.id');
+        $reason = input('post.reason');
+        // $form = new FormModel();
+        // $result = $form->where('id',$formId)->update(['status' => '2', 'reason'=>$reason]);
+        // if($result){
+        //     return json_encode([
+        //         'code'=>'0001',
+        //         'msg' =>'操作失败'
+        //     ]);
+        // }
+        return json_encode([
+            'code'=>'0000',
+            'msg' =>'操作成功'
+        ]);
+    }
+
+
+
 }

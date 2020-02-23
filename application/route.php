@@ -26,6 +26,6 @@ return [
     'profile'=>'index/index/profile',
 
 
-    'admin'=> 'index/index/admin_index',
-    'admin/form-detail' => 'index/index/admin_form_detail'
+    'admin/'=> 'index/index/admin_index',
+    'admin-form-detail/' => 'index/index/admin_form_detail'
  ];
