@@ -8,6 +8,7 @@ use think\Controller;
 
 use app\index\model\Form as FormModel;
 use app\index\model\Upload as UploadModel;
+use think\Session;
 
 class Form extends Controller
 {
@@ -38,6 +39,7 @@ class Form extends Controller
 
         // 填入表单的主要数据
         $form = new FormModel();
+        $form->user_id = Session::get('id');
         $form->date = $date;
         $form->type = $type;
         $form->name = '王老师';
@@ -52,6 +54,7 @@ class Form extends Controller
         $form->material = $expense[6];
         $form->travel  = $expense[7];
         $form->assets  = $expense[8];
+        $form->next_manager = 1;
         $form->save();
 
         // 拿到表单的id
@@ -147,9 +150,8 @@ class Form extends Controller
 
     }
 
-
-    // 后台
-    public function getFormList(){
+    // 获取用户自己申请中的表单
+    public function getUserFormList(){
         $page = input("get.page","1");
         //step 1.格式化数据
         $page=(int) $page;
@@ -157,11 +159,11 @@ class Form extends Controller
         //step 2. 计算分页
         $form = new FormModel();
         $pageSize=3;
-        $totalCount=$form->count();
+        $totalCount=$form->where('user_id',Session::get('id'))->where('status',0)->count();
         $pageCount=ceil($totalCount/$pageSize);
 
         //step 3. 获取分页数据
-        $result=$form->page($page,$pageSize)->select();
+        $result=$form->where('user_id',Session::get('id'))->where('status',0)->page($page,$pageSize)->select();
         if(!$result){
             return json_encode(
                 [
@@ -203,6 +205,175 @@ class Form extends Controller
         );
     }
 
+    // 获取用户已被审核的表单
+    public function getUserFormResult(){
+        $page = input("get.page","1");
+        //step 1.格式化数据
+        $page=(int) $page;
+        //step 2. 计算分页
+        $form = new FormModel();
+        $pageSize=3;
+        $totalCount=$form->where('user_id',Session::get('id'))->where('status','>',0)->count();
+        $pageCount=ceil($totalCount/$pageSize);
+
+        //step 3. 获取分页数据
+        $result=$form->where('user_id',Session::get('id'))->where('status','>',0)->page($page,$pageSize)->select();
+        if(!$result){
+            return json_encode(
+                [
+                    'code'=>'0002',
+                    'msg'=>'获取表单时发生了一些问题'
+                ]
+            );
+        }
+
+        //step 4.获取每一条问题到底是谁发起的
+        $formList=[];
+        foreach($result as $formItem){
+            array_push($formList,[
+                "id"=>$formItem->id,
+                "date"=>$formItem->date,
+                "name"=>$formItem->name,
+                "type"=>$formItem->type,
+                "office"=>$formItem->office,
+                "entertain"=>$formItem->entertain,
+                "meeting"=>$formItem->meeting,
+                "train"=>$formItem->train,
+                "activity"=>$formItem->activity,
+                "competition"=>$formItem->competition,
+                "material"=>$formItem->material,
+                "travel"=>$formItem->travel,
+                "assets"=>$formItem->assets,
+                "status"=>$formItem->status,
+                "reason"=>$formItem->reason,
+            ]);
+        }
+        return json_encode(
+            [
+                'code' => '0000',
+                'msg' => '获取成功',
+                "data" => [
+                    'pageCount' => $pageCount,
+                    'forms' => $formList
+                ]
+            ]
+        );
+    }
+
+    // 后台
+    // 获取需要审核的表单
+    public function getFormList(){
+        $page = input("get.page","1");
+        $level = Session::get('job')  === 4 ? 1 :2;
+        //step 1.格式化数据
+        $page=(int) $page;
+
+        //step 2. 计算分页
+        $form = new FormModel();
+        $pageSize=3;
+        $totalCount=$form->where('status',0)->where('process',$level)->count();
+        $pageCount=ceil($totalCount/$pageSize);
+
+        //step 3. 获取分页数据
+        $result=$form->where('status',0)->where('process',$level)->page($page,$pageSize)->select();
+        if(!$result){
+            return json_encode(
+                [
+                    'code'=>'0002',
+                    'msg'=>'获取表单时发生了一些问题'
+                ]
+            );
+        }
+
+        //step 4.获取每一条问题到底是谁发起的
+        $formList=[];
+        foreach($result as $formItem){
+            array_push($formList,[
+                "id"=>$formItem->id,
+                "date"=>$formItem->date,
+                "name"=>$formItem->name,
+                "type"=>$formItem->type,
+                "office"=>$formItem->office,
+                "entertain"=>$formItem->entertain,
+                "meeting"=>$formItem->meeting,
+                "train"=>$formItem->train,
+                "activity"=>$formItem->activity,
+                "competition"=>$formItem->competition,
+                "material"=>$formItem->material,
+                "travel"=>$formItem->travel,
+                "assets"=>$formItem->assets,
+                "status"=>$formItem->status,
+            ]);
+        }
+        return json_encode(
+            [
+                'code' => '0000',
+                'msg' => '获取成功',
+                "data" => [
+                    'pageCount' => $pageCount,
+                    'forms' => $formList
+                ]
+            ]
+        );
+    }
+
+    // 获取已审核的表单
+    public function getFormResult(){
+        $page = input("get.page","1");
+        //step 1.格式化数据
+        $page=(int) $page;
+
+        //step 2. 计算分页
+        $form = new FormModel();
+        $pageSize=3;
+        $totalCount=$form->where('status','>',0)->count();
+        $pageCount=ceil($totalCount/$pageSize);
+
+        //step 3. 获取分页数据
+        $result=$form->where('status','>',0)->page($page,$pageSize)->select();
+        if(!$result){
+            return json_encode(
+                [
+                    'code'=>'0002',
+                    'msg'=>'获取表单时发生了一些问题'
+                ]
+            );
+        }
+
+        //step 4.获取每一条问题到底是谁发起的
+        $formList=[];
+        foreach($result as $formItem){
+            array_push($formList,[
+                "id"=>$formItem->id,
+                "date"=>$formItem->date,
+                "name"=>$formItem->name,
+                "type"=>$formItem->type,
+                "office"=>$formItem->office,
+                "entertain"=>$formItem->entertain,
+                "meeting"=>$formItem->meeting,
+                "train"=>$formItem->train,
+                "activity"=>$formItem->activity,
+                "competition"=>$formItem->competition,
+                "material"=>$formItem->material,
+                "travel"=>$formItem->travel,
+                "assets"=>$formItem->assets,
+                "status"=>$formItem->status,
+                "reason"=>$formItem->reason
+            ]);
+        }
+        return json_encode(
+            [
+                'code' => '0000',
+                'msg' => '获取成功',
+                "data" => [
+                    'pageCount' => $pageCount,
+                    'forms' => $formList
+                ]
+            ]
+        );
+    }
+
+    // 获取表单详情
     public function getFormDetail(){
         $id = input('get.id');
         $form = new FormModel();
@@ -235,6 +406,7 @@ class Form extends Controller
         );
     }
 
+    // 获取差旅费
     public  function getFormBusinessTravel(){
         $formId = input('get.id');
         $result = new BusinessTravel();
@@ -300,6 +472,7 @@ class Form extends Controller
         ]);
     }
 
+    // 获取固定资产费详情
     public  function getFormAssets(){
         $formId = input('get.id');
         $Assets = new Assets();
@@ -340,6 +513,7 @@ class Form extends Controller
         ]);
     }
 
+    // 获取图片
     public function getFormImages(){
         $formId = input('get.id');
         $result = UploadModel::where('form_id',$formId)->select();
@@ -363,6 +537,7 @@ class Form extends Controller
         ]);
     }
 
+    // 不批准
     public function rejectForm(){
         $formId = input('post.id');
         $reason = input('post.reason');
@@ -380,23 +555,42 @@ class Form extends Controller
         ]);
     }
 
+    // 批准
     public function approveForm(){
         $formId = input('post.id');
-        $reason = input('post.reason');
-        // $form = new FormModel();
-        // $result = $form->where('id',$formId)->update(['status' => '2', 'reason'=>$reason]);
-        // if($result){
-        //     return json_encode([
-        //         'code'=>'0001',
-        //         'msg' =>'操作失败'
-        //     ]);
-        // }
+        $form = new FormModel();
+        $result = $form->where('id',$formId)->find();
+        $process = $result->process;
+        if($process === 1){
+            $form->where('id', $formId)->update(['process'=>2]);
+        }else{
+            $form->where('id', $formId)->update(['status'=>1]);
+        }
+
         return json_encode([
             'code'=>'0000',
             'msg' =>'操作成功'
         ]);
     }
 
+    // 撤销表单
+    public function revokeForm(){
+        $formId = input('post.id');
+        $form = new FormModel();
+        $result = $form->where('id',$formId)->delete();
+        $business = new BusinessTravel();
+        $result = $business->where('form_id',$formId)->delete();
+        $images = new UploadModel();
+        $result = $images->where('form_id',$formId)->delete();
+        $trafficDetail = new TrafficDetail();
+        $result = $trafficDetail->where('form_id',$formId)->delete();
+        $assets = new Assets();
+        $result = $assets->where('form_id',$formId)->delete();
 
+        return json_encode([
+            'code'=>'0000',
+            'msg' =>'撤销成功'
+        ]);
+    }
 
 }

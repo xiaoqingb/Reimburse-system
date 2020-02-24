@@ -14,25 +14,23 @@ class User extends Auth
 
     public function login()
     {
-        $email = input('post.email', '');
+        $account = input('post.account');
         $password = input('post.password', '');
-
         //step 1.验证用户的输入
         $rule = [
-            'email' => 'require|email',
+            'account' => 'require',
             'password' => 'require',
 
         ];
         $msg = [
-            'email.require' => '你忘记输入邮箱了哦~',
-            'email.email' => '你的邮箱格式有误哦~',
             'password.require' => '你没有输入密码哦~QAQ',
+            'account.require' => '你忘记输入帐号了哦~',
         ];
         $data = [
-            'password' => $password,
-            'email' => $email,
+            'account' => $account,
+            'password' => $password
         ];
-        $validate = new Validate($rule, $msg);
+        $validate = new Validate($rule,$msg);
         $result = $validate->check($data);
         if (!$result) {
             return json_encode(
@@ -45,18 +43,18 @@ class User extends Auth
 
         // step 2. 判断账号存不存在
         $user = new UserModel();
-        $result = $user->where('email', $email)->find();
+        $result = $user->where('account', $account)->find();
         if (!$result) {
             return json_encode(
                 [
                     'code' => '0001',
-                    'msg' => '账号或密码错误!'
+                    'msg' => '账号不存在!'
                 ]
             );
         }
         //step 3.验证账号密码正不正确
-        $user = $user->where('email', $email)->where('password', md5($password))->find();
-        
+        $user = $user->where('account', $account)->where('password', md5($password))->find();
+
         if (!$user) {
             //密码错误
             return json_encode(
@@ -70,11 +68,13 @@ class User extends Auth
         //step 4.成功登录后将数据写入 session 和cookie
         Session::set('name', $user->name);
         Session::set('id', $user->id);
-        Cookie::set('user', $user->id . "::" . $user->name, 7 * 24 * 60 * 60, '/');
+        Session::set('job',$user->job);
+        Cookie::set('user', $user->id . "::" . $user->name . "::" . $user->job , 7 * 24 * 60 * 60, '/');
         return json_encode(
             [
                 'code' => '0000',
-                'msg' => '登录成功'
+                'msg' => '登录成功',
+                'data' => $user->job
             ]
         );
     }
@@ -128,14 +128,6 @@ class User extends Auth
                 ]
             );
         }
-        switch($job){
-            case '教师':
-                $job = 1;
-                break;
-            case '管理员':
-                $job = 2;
-                break;
-        }
         //插入用户
         $user->account = $account;
         $user->password = md5($password);
@@ -162,15 +154,128 @@ class User extends Auth
 
     public function getName()
     {
+        if(Session::get('name') && Session::get('job') === 1){
+            return json_encode(
+                [
+                    'code' => '0000',
+                    'msg' => '获取用户名成功！',
+                    'data' => Session::get('name'),
+                ]
+            );
+        }
+        return json_encode(
+            [
+                'code' => '0001',
+                'msg' => '用户未登录！'
+            ]
+        );
+    }
+    public function getAdminName()
+    {
+        if(Session::get('name') && Session::get('job') !== 1){
+            return json_encode(
+                [
+                    'code' => '0000',
+                    'msg' => '获取用户名成功！',
+                    'data' => Session::get('name'),
+                ]
+            );
+        }
+        return json_encode(
+            [
+                'code' => '0001',
+                'msg' => '用户未登录！'
+            ]
+        );
+
+    }
+
+
+    public function change_basic_msg()
+    {
+        $member = new MemberModel();
+        $nickName = input('post.nickName');
+        $email = input('post.email');
+        $rule = [
+            'email' => 'require|email',
+        ];
+        $msg = [
+            'email.email' => '你的邮箱格式有误',
+        ];
+        $data = [
+            'email' => $email,
+        ];
+        $validate = new Validate($rule, $msg);
+        $result = $validate->check($data);
+        if (!$result) {
+            return json_encode(
+                [
+                    'code' => '0001',
+                    'msg' => $validate->getError()
+                ]
+            );
+        }
+        $userQq = input('post.userQq');
+        $userHome = input('post.userHome');
+        $description = input('post.description');
+        if ($nickName) {
+            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['username' => $nickName]);
+        }
+        if ($email) {
+            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['usermail' => $email]);
+        }
+        if ($userQq) {
+            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['userqq' => $userQq]);
+        }
+        if ($userHome) {
+            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['userhome' => $userHome]);
+        }
+        if ($description) {
+            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['description' => $description]);
+        }
+        return json_encode(
+            [
+                'code'=>'0000',
+                'msg'=>'修改成功'
+            ]
+        );
+    }
+    // 修改密码
+    public function change_password(){
+        $member = new MemberModel();
+        $newPassword = input('post.newPassword');
+        $oldPassword = input('post.oldPassword');
+        $result=$member->table('tp_member')->where('userid', Session::get('userid'))->where('password',$oldPassword)->select();
+        if ($result===[]){
+            return json_encode(
+                [
+                    'code' => '0000',
+                    'msg' => '旧密码有误'
+                ]
+            );
+        }
+        $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['password' => $newPassword]);
         return json_encode(
             [
                 'code' => '0000',
-                'msg' => '获取用户名成功！',
-                'data' => Session::get('name'),
+                'msg' => '修改成功'
             ]
         );
     }
 
+    public function getUserMsg(){
+        $user = new UserModel();
+        $userMsg = $user->where('id',Session::get('id'))->find();
+        return json_encode([
+            'code'=> '0000',
+            'msg'=>'获取成功',
+            'data'=>[
+                'name'=> $userMsg->name,
+                'phone'=> $userMsg->phone,
+                'major'=> $userMsg->major
+            ]
+        ]);
+    }
     public function logout()
     {
         Session::clear();

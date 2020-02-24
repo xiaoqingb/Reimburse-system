@@ -11,6 +11,7 @@ class Auth extends Controller{
             // 用户id::用户的姓名
             Session::set("id",explode("::",Cookie::get('user'))[0]);
             Session::set("name",explode("::",Cookie::get('user'))[1]);
+            Session::set("job",explode("::",Cookie::get('user'))[2]);
         };
         if(!Session::has('name')){
             die(json_encode(

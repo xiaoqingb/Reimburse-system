@@ -18,7 +18,7 @@ class Index
     public function apply(){return view();}
     // 2.已申请页面
     public function applying(){return view();}
-    // 3.已报销页面
+    // 3.报销结果页面
     public function applied(){return view();}
     // 4.个人信息页面
     public function profile(){return view();}
@@ -26,5 +26,7 @@ class Index
     // 后台
     public function admin_index(){return view();}
     public function admin_form_detail(){return view();}
+    public function admin_profile(){return view();}
+    public function admin_applied(){return view();}
 
 }
