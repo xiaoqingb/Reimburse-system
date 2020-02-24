@@ -1,12 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
+    <link rel="stylesheet/less" type="text/css" href="__PUBLIC__/static/styles/less/admin.less">
+    <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
+    <script src="__PUBLIC__/static/lib/less-3.9.0.js"></script>
+    <script src="__PUBLIC__/static/lib/layui/layui.js"></script>
+    <title>商学院自主报账系统</title>
 </head>
+
 <body>
-    申请成功页面
+    <header>
+        <div id="system-name">
+            商学院自主报账系统
+        </div>
+        <ul class="layui-nav " lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;" id="user-name"></a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd><a href="profile">个人资料</a></dd>
+                    <dd><a href="" id="logout">注销</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </header>
+    <main>
+        <div id="menu">
+            <ul>
+                <li class="menu-item">
+                    <a href="apply">
+                        <span>申请报销</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="applying">
+                        <span>申请中</span>
+                    </a>
+                </li>
+                <li class="menu-item bg-dark">
+                    <a href="applied">
+                        <span>报销结果</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="profile">
+                        <span>个人资料</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div id="page">
+            <div id="header">
+                <span class="current">申请中</span>
+            </div>
+            <div id="content">
+                <div id="form-container"></div>
+                <div id="demo0"></div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const type = [
+            '质量工程',
+            '学术讲座',
+            '专业建设活动',
+            '实习基地扩展',
+            '实践教学经费',
+            '学生活动经费',
+        ]
+        $('#logout').click(()=>{
+            $.ajax({
+                url: "__PUBLIC__/index/User/logout",
+                type: "post",
+                success:  (response)=>{
+                    response = JSON.parse(response);
+                    location.href = "login"
+                }
+            })
+        })
+        function getFormList(page = 1){
+            $.ajax({
+                url: '__PUBLIC__/index/Form/getUserFormList',
+                type: 'get',
+                data:{
+                    page
+                },
+                success:function (response) {
+                    response = JSON.parse(response)
+                    if(response.code !== '0000'){
+                        $('#form-container').html('当前没有人申请')
+                        return
+                    }
+                    let forms = response.data.forms
+                    let html = `
+                    <table id="forms">
+                        <tr>
+                            <th>时间</th>
+                            <th>姓名</th>
+                            <th>类型</th>
+                            <th>办公费</th>
+                            <th>招待费</th>
+                            <th>会议费</th>
+                            <th>培训费</th>
+                            <th>学生活动费</th>
+                            <th>学生竞赛费</th>
+                            <th>材料物料费</th>
+                            <th>差旅费</th>
+                            <th>固定资产费</th>
+                            <th>状态</th>
+                            <th>原因</th>
+
+                        </tr>
+                    `
+                    forms.forEach(element => {
+                        html += `
+                            <tr>
+                                <td>${element.date}</td>
+                                <td>${element.name}</td>
+                                <td>${type[element.type - 1]}</td>
+                                <td>${element.office}</td>
+                                <td>${element.entertain}</td>
+                                <td>${element.meeting}</td>
+                                <td>${element.train}</td>
+                                <td>${element.activity}</td>
+                                <td>${element.competition}</td>
+                                <td>${element.material}</td>
+                                <td>${element.travel}</td>
+                                <td>${element.assets}sssssss</td>
+                                <td>${element.status === 1 ? '通过审核' : '不通过'}</td>
+                                <td>
+                                    ${element.reason}
+                                </td>
+                            </tr>
+                    `})
+                    html += `</table>`
+                    $('#form-container').html(html)
+                }
+            })
+        }
+        
+        window.onload = function(){
+            let p1 = function (){
+                return new Promise(function(resolve,reject){
+                    $.ajax({
+                        url: "__PUBLIC__/index/User/getName",
+                        type: "get",
+                        async:false,
+                        success:  (response)=>{
+                            response = JSON.parse(response);
+                            // 获取失败则跳转dao登录页面
+                            if (response.code!== "0000") {
+                                location.href = "login";
+                            }
+                            // 获取成功则输出昵称
+                            $("#user-name").append(response.data);
+                        }
+                    });
+                    $.ajax({
+                        url: '__PUBLIC__/index/Form/getUserFormResult',
+                        type: 'get',
+                        data:{
+                            page : 1
+                        },
+                        success:function (response) {
+                            response = JSON.parse(response)
+                            if(response.code !== '0000'){
+                                $('#form-container').html('当前没有人申请')
+                                return
+                            }
+                            let forms = response.data.forms
+                            let html = `
+                                <table id="forms">
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>姓名</th>
+                                        <th>类型</th>
+                                        <th>办公费</th>
+                                        <th>招待费</th>
+                                        <th>会议费</th>
+                                        <th>培训费</th>
+                                        <th>学生活动费</th>
+                                        <th>学生竞赛费</th>
+                                        <th>材料物料费</th>
+                                        <th>差旅费</th>
+                                        <th>固定资产费</th>
+                                        <th>状态</th>
+                                        <th>原因</th>
+                                    </tr>
+                            `
+                            forms.forEach(element => {
+                                html += `
+                                    <tr>
+                                        <td>${element.date}</td>
+                                        <td>${element.name}</td>
+                                        <td>${type[element.type - 1]}</td>
+                                        <td>${element.office}</td>
+                                        <td>${element.entertain}</td>
+                                        <td>${element.meeting}</td>
+                                        <td>${element.train}</td>
+                                        <td>${element.activity}</td>
+                                        <td>${element.competition}</td>
+                                        <td>${element.material}</td>
+                                        <td>${element.travel}</td>
+                                        <td>${element.assets}</td>
+                                        <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
+                                        <td>
+                                            ${element.reason}
+                                        </td>
+                                    </tr>
+                            `})
+                            html += `</table>`
+                            $('#form-container').html(html)
+                            return resolve(response.data.pageCount)
+                        }
+                    })
+                })
+            }
+            p1().then((pageCount = 1)=>{
+                
+                layui.use(['laypage', 'layer','element'], function(){
+                    var laypage = layui.laypage,
+                    layer = layui.layer,
+                    element = layui.element
+                    
+                    //总页数低于页码总数
+                    laypage.render({
+                        elem: 'demo0',
+                        limit: 3
+                        ,count: 3*pageCount //数据总数
+                        ,jump: function(obj, first){
+                            if(!first){
+                                getFormList(obj.curr)
+                            }
+                        }
+                    });
+                })
+                $('#form-container').click(function($event){
+                    // 撤销
+                    if($($event.target).get(0).className === 'revoke'){
+                        let tr = $($($event.target).get(0).parentElement.parentElement)
+                        if(confirm('确定撤销该表单吗')){
+                            $.ajax({
+                                url: '__PUBLIC__/index/Form/revokeForm',
+                                type: 'post',
+                                data: {
+                                    id: $($($event.target).get(0)).data('id')
+                                },
+                                success:function(response){
+                                    response= JSON.parse(response)
+                                    if(response.code !== '0000'){
+                                        layer.msg('撤销失败，请联系管理员')
+                                        return
+                                    }
+                                    layer.msg('撤销成功')
+                                    tr.remove()
+                                }
+                            })
+                        }else{
+                            layer.msg('您取消了操作')
+                        }
+                    }
+                })
+            })
+         
+        }
+    </script>
 </body>
 </html>

@@ -23,7 +23,7 @@
                 <a href="javascript:;" id="user-name"></a>
                 <dl class="layui-nav-child">
                     <!-- 二级菜单 -->
-                    <dd><a href="profile">个人资料</a></dd>
+                    <dd><a href="admin_profile">个人资料</a></dd>
                     <dd><a href="" id="logout">注销</a></dd>
                 </dl>
             </li>
@@ -31,24 +31,19 @@
     </header>
     <main>
         <div id="menu">
-            <ul>
+            <ul class="">
                 <li class="menu-item">
-                    <a href="apply">
-                        <span>申请报销</span>
+                    <a href="admin">
+                        <span>审核列表</span>
                     </a>
                 </li>
                 <li class="menu-item bg-dark">
-                    <a href="applying">
-                        <span>申请中</span>
+                    <a href="admin_applied">
+                        <span>已审核</span>
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="applied">
-                        <span>报销结果</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="profile">
+                    <a href="admin_profile">
                         <span>个人资料</span>
                     </a>
                 </li>
@@ -56,7 +51,7 @@
         </div>
         <div id="page">
             <div id="header">
-                <span class="current">申请中</span>
+                <span class="current">已审核</span>
             </div>
             <div id="content">
                 <div id="form-container"></div>
@@ -85,7 +80,7 @@
         })
         function getFormList(page = 1){
             $.ajax({
-                url: '__PUBLIC__/index/Form/getUserFormList',
+                url: '__PUBLIC__/index/Form/getFormResult',
                 type: 'get',
                 data:{
                     page
@@ -113,7 +108,7 @@
                             <th>差旅费</th>
                             <th>固定资产费</th>
                             <th>状态</th>
-                            <th>操作</th>
+                            <th>原因</th>
 
                         </tr>
                     `
@@ -131,10 +126,10 @@
                                 <td>${element.competition}</td>
                                 <td>${element.material}</td>
                                 <td>${element.travel}</td>
-                                <td>${element.assets}sssssss</td>
-                                <td>审核中</td>
+                                <td>${element.assets}</td>
+                                <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
                                 <td>
-                                    <button class="revoke" data-id="${element.id}">撤销</button>
+                                    ${element.reason}
                                 </td>
                             </tr>
                     `})
@@ -148,7 +143,7 @@
             let p1 = function (){
                 return new Promise(function(resolve,reject){
                     $.ajax({
-                        url: "__PUBLIC__/index/User/getName",
+                        url: "__PUBLIC__/index/User/getAdminName",
                         type: "get",
                         async:false,
                         success:  (response)=>{
@@ -162,13 +157,14 @@
                         }
                     });
                     $.ajax({
-                        url: '__PUBLIC__/index/Form/getUserFormList',
+                        url: '__PUBLIC__/index/Form/getFormResult',
                         type: 'get',
                         data:{
                             page : 1
                         },
                         success:function (response) {
                             response = JSON.parse(response)
+                            console.log(response)
                             if(response.code !== '0000'){
                                 $('#form-container').html('当前没有人申请')
                                 return
@@ -190,7 +186,7 @@
                                         <th>差旅费</th>
                                         <th>固定资产费</th>
                                         <th>状态</th>
-                                        <th>操作</th>
+                                        <th>原因</th>
                                     </tr>
                             `
                             forms.forEach(element => {
@@ -208,9 +204,9 @@
                                         <td>${element.material}</td>
                                         <td>${element.travel}</td>
                                         <td>${element.assets}</td>
-                                        <td>审核中</td>
+                                        <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
                                         <td>
-                                            <button class="revoke" data-id="${element.id}">撤销</button>
+                                            ${element.reason}
                                         </td>
                                     </tr>
                             `})

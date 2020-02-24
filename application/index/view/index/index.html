@@ -22,33 +22,37 @@
         </div>
         <ul class="layui-nav " lay-filter="">
             <li class="layui-nav-item">
-                <a href="javascript:;">用户名</a>
+                <a href="javascript:;" id="user-name"></a>
                 <dl class="layui-nav-child">
                     <!-- 二级菜单 -->
-                    <dd><a href="">个人资料</a></dd>
-                    <dd><a href="">注销</a></dd>
+                    <dd><a href="profile">个人资料</a></dd>
+                    <dd><a href="" id="logout">注销</a></dd>
                 </dl>
             </li>
         </ul>
     </header>
     <main>
         <div id="menu">
-            <ul class="" lay-filter="test">
+            <ul>
                 <li class="menu-item bg-dark">
-                    <div class="hover-label"></div>
-                    <a id="apply">申请报销</a>
+                    <a href="apply"">
+                        <span>申请报销</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <div class="hover-label"></div>
-                    <a id="applying">申请中</a>
+                    <a href="applying">
+                        <span>申请中</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <div class="hover-label"></div>
-                    <a id="applied">已报销</a>
+                    <a href="applied">
+                        <span>报销结果</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <div class="hover-label"></div>
-                    <a id="profile">个人资料</a>
+                    <a href="profile">
+                        <span>个人资料</span>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -401,7 +405,6 @@
     <script src="__PUBLIC__/static/lib/xqbUploadFile.js"></script>
 
     <script>
-        // console.log()
         layui.use(['layer', 'form','element','laydate','table'], function(){
             var form = layui.form,
                 layer = layui.layer,
@@ -416,7 +419,16 @@
             })
             // layer.msg('Hello World');
         });
-
+        $('#logout').click(()=>{
+            $.ajax({
+                url: "__PUBLIC__/index/User/logout",
+                type: "post",
+                success:  (response)=>{
+                    response = JSON.parse(response);
+                    location.href = "login"
+                }
+            })
+        })
         // 差旅费合计函数
         function caculate(){
             var count = 0
@@ -509,6 +521,21 @@
                 })
             }
         window.onload = function () {
+            $.ajax({
+                url: "__PUBLIC__/index/User/getName",
+                type: "get",
+                success:  (response)=>{
+                    response = JSON.parse(response);
+                    // 获取失败则跳转dao登录页面
+                    if (response.code!== "0000") {
+                        location.href = "login";
+                        return;
+                    }
+                    // 获取成功则输出昵称
+                    $("#user-name").append(response.data);
+                }
+            });
+
             bindTd()
             $('.menu-item').click(function () {
                 location.href = this.children[1].id

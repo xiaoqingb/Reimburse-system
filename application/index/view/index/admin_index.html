@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <!-- <link href="__PUBLIC__/static/styles/less/apply.less" rel="stylesheet/less"> -->
     <link rel="stylesheet/less" type="text/css" href="__PUBLIC__/static/styles/less/admin.less">
     <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
     <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
@@ -22,11 +21,11 @@
         </div>
         <ul class="layui-nav " lay-filter="">
             <li class="layui-nav-item">
-                <a href="javascript:;">用户名</a>
+                <a href="javascript:;" id="user-name"></a>
                 <dl class="layui-nav-child">
                     <!-- 二级菜单 -->
-                    <dd><a href="">个人资料</a></dd>
-                    <dd><a href="">注销</a></dd>
+                    <dd><a href="admin_profile">个人资料</a></dd>
+                    <dd><a href="" id="logout">注销</a></dd>
                 </dl>
             </li>
         </ul>
@@ -35,22 +34,24 @@
         <div id="menu">
             <ul class="">
                 <li class="menu-item bg-dark">
-                    <div class="hover-label"></div>
-                    <a id="apply">审核列表</a>
+                    <a href="admin">
+                        <span>审核列表</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <div class="hover-label"></div>
-                    <a id="applying">申请中</a>
+                    <a href="admin_applied">
+                        <span>已审核</span>
+                    </a>
                 </li>
                 <li class="menu-item">
-                    <div class="hover-label"></div>
-                    <a id="profile">个人资料</a>
+                    <a href="admin_profile">
+                        <span>个人资料</span>
+                    </a>
                 </li>
             </ul>
         </div>
         <div id="page">
             <div id="header">
-                <!-- <span>申请列表  </span> -->
                 <span class="current">申请列表</span>
             </div>
             <div id="content">
@@ -118,10 +119,10 @@
                                 <td>${element.competition}</td>
                                 <td>${element.material}</td>
                                 <td>${element.travel}</td>
-                                <td>${element.assets}sssssss</td>
+                                <td>${element.assets}</td>
                                 <td>待审核</td>
                                 <td>
-                                    <button class="check-detail" data-id="${element.id}">sss详情</button>
+                                    <button class="check-detail" data-id="${element.id}">详情</button>
                                     <button class="approve" data-id="${element.id}">批准</button>
                                     <button class="reject" data-id="${element.id}">不批准</button>
                                 </td>
@@ -134,8 +135,33 @@
         }
         
         window.onload = function () {
+            
+            $('#logout').click(()=>{
+                $.ajax({
+                    url: "__PUBLIC__/index/User/logout",
+                    type: "post",
+                    success:  (response)=>{
+                        response = JSON.parse(response);
+                        location.href = "login"
+                    }
+                })
+            })
             let p1 = function (){
                 return new Promise(function(resolve,reject){
+                    $.ajax({
+                        url: "__PUBLIC__/index/User/getAdminName",
+                        type: "get",
+                        async:false,
+                        success:  (response)=>{
+                            response = JSON.parse(response);
+                            // 获取失败则跳转dao登录页面
+                            if (response.code!== "0000") {
+                                location.href = "login";
+                            }
+                            // 获取成功则输出昵称
+                            $("#user-name").append(response.data);
+                        }
+                    });
                     $.ajax({
                         url: '__PUBLIC__/index/Form/getFormList',
                         type: 'get',
@@ -199,9 +225,11 @@
                 })
             }
             p1().then((pageCount = 1)=>{
-                layui.use(['laypage', 'layer'], function(){
-                    var laypage = layui.laypage
-                    ,layer = layui.layer
+                
+                layui.use(['laypage', 'layer','element'], function(){
+                    var laypage = layui.laypage,
+                    layer = layui.layer,
+                    element = layui.element
                     
                     //总页数低于页码总数
                     laypage.render({
@@ -277,10 +305,9 @@
                                         $('#black-bg').get(0).remove()
                                         return
                                     }
-                                    layer.msg('成功不批准')
+                                    layer.msg('提交成功')
                                     $('#black-bg').get(0).remove()
                                     tr.remove()
-
                                 }
                             })
                         })

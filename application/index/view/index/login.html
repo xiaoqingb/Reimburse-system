@@ -28,7 +28,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">帐号</label>
                     <div class="layui-input-block">
-                    <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题"  class="layui-input">
+                    <input type="text" name="account" required  lay-verify="required" placeholder="请输入标题"  class="layui-input">
                     </div>
                 </div>
             </div>
@@ -42,41 +42,44 @@
                 </div>
             </div>
          
-            </div>
             <div class="layui-form-item">
-                <div class="layui-input-block">
-                <button id="login-btn" class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                </div>
+                <button style="float: right; margin-right: 20px;" id="login-btn" class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
             </div>
-        </div>
+            <a href="regist" style="float: right; margin-right: 20px;">还没有帐号？前往注册</a>
+
     </main>
     <script>
         let login = (loginData)=>{
             console.log(loginData);
-            $.ajax({
-                url: "__PUBLIC__/index/user/login",
-                type: "post",
-                data: loginData,
-                success:(response)=>{
-                    response = JSON.parse(response);
-                    console.log(response);
-                    if(response.code!=="0000"){
-                        $("#error-text").html(response.msg);
-                        return;
-                    }
-                    location.href="index.html";
-                }
-            });
+            
         }
         layui.use(['form'], function(){
-            var form = layui.form;
+            var form = layui.form,
+            layer= layui.layer
             //监听提交
             form.on('submit(formDemo)', function(data){
-                layer.msg(JSON.stringify(data.field));
-                login(JSON.stringify(data.field))
-            });
-        });
+                $.ajax({
+                    url: "__PUBLIC__/index/user/login",
+                    type: "post",
+                    data: data.field,
+                    success:(response)=>{
+                        response = JSON.parse(response)
+                        console.log(response)
+                        if(response.code!=="0000"){
+                            layer.msg(response.msg)
+                            return
+                        }
+                        console.log(response.data)
+                        if(response.data !== 1){
+                            location.href="admin"
+                            return
+                        }
+                        location.href="index"
+
+                    }
+                })
+            })
+        })
    
     </script>
 </body>

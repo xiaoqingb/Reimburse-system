@@ -16,15 +16,18 @@
     <main>
         <div id='regist-frame'>
                 <h1>
-                    用户注册
+                    帐号注册
                 </h1>
                 <div class="layui-form" action="">
                     <!-- 身份 -->
                     <div class="layui-form-item">
                         <label class="layui-form-label">身份</label>
                         <div class="layui-input-block">
-                        <input type="radio" name="job" value="教师" title="教师" checked>
-                        <input type="radio" name="job" value="管理员" title="管理员" >
+                        <input type="radio" name="job" value="1" title="教师" checked>
+                        <input type="radio" name="job" value="2" title="副院长" checked>
+                        <input type="radio" name="job" value="3" title="院长" checked>
+                        <input type="radio" name="job" value="4" title="办公室报账助理" >
+                        <input type="radio" name="job" value="5" title="办公室报账负责人" >
                         </div>
                     </div>
 
@@ -62,7 +65,6 @@
                         <label class="layui-form-label">专业</label>
                         <div id="select-box">
                             <select name="major" lay-verify="">
-                                <option value="">管理员不用选择</option>
                                 <option value="人力资源">人力资源</option>
                                 <option value="信息管理与信息系统">信息管理与信息系统</option>
                                 <option value="市场营销">市场营销</option>
@@ -85,23 +87,25 @@
                             <input type="text" name="phone" required lay-verify="required"  placeholder="手机号码" autocomplete="off" class="layui-input">
                         </div>
                     </div>
-
                     <div class="layui-form-item">
-                        <div class="layui-input-block">
-                        <button id="regist-btn" class="layui-btn" lay-submit lay-filter="formDemo">注册</button>
-                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                        </div>
+                        <button id="regist-btn" class="layui-btn" style="float: right; margin-right: 20px;" lay-submit lay-filter="formDemo">注册</button>
                     </div>
+                    <a href="login" style="float: right; margin-right: 20px;">已有帐号？前往登录</a>
                 </div>
         </div>
     </main>
     <script>
         let regist = (loginData)=>{
-            console.log(loginData);
-            $.ajax({
+            
+        }
+        layui.use(['form'], function(){
+            var form = layui.form;
+            //监听提交
+            form.on('submit(formDemo)', function(data){
+                $.ajax({
                 url: "__PUBLIC__/index/user/regist",
                 type: "post",
-                data: loginData,
+                data: data.field,
                 success:(response)=>{
                     response = JSON.parse(response);
                     console.log(response);
@@ -109,17 +113,12 @@
                         layer.msg(response.msg);
                         return;
                     }
-                    // location.href="index.html";
+                    layer.msg(response.msg);
+                    setTimeout(() => {
+                        location.href = 'login'
+                    }, 3000);
                 }
             });
-        }
-        layui.use(['form'], function(){
-            var form = layui.form;
-            //监听提交
-            form.on('submit(formDemo)', function(data){
-                // layer.msg(JSON.stringify(data.field));
-                console.log(data.field);
-                regist(data.field)
             });
         });
    
