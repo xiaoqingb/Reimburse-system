@@ -5,12 +5,12 @@ use app\index\model\User as UserModel;
 use think\Session;
 use think\Cookie;
 use think\Validate;
-
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With');
+header('Access-Control-Allow-Methods: GET, POST');
+header('Access-Control-Max-Age: 1728000');
 class User extends Auth
 {
-    // protected $beforeActionList = [
-    //     'isAuthed' => ['only' => 'getName']
-    // ];
 
     public function login()
     {
@@ -191,19 +191,24 @@ class User extends Auth
     }
 
 
-    public function change_basic_msg()
+    public function changeMsg()
     {
-        $member = new MemberModel();
-        $nickName = input('post.nickName');
-        $email = input('post.email');
+
+        $newName = input('post.newName');
+        $newMajor = input('post.newMajor');
+        $newPhone = input('post.newPhone');
         $rule = [
-            'email' => 'require|email',
+            'newName' => 'require',
+            'newMajor' => 'require',
+            'newPhone' => 'require',
         ];
         $msg = [
-            'email.email' => '你的邮箱格式有误',
+            'email.require' => '你的邮箱格式有误',
         ];
         $data = [
-            'email' => $email,
+            'newName' => $newName,
+            'newMajor' => $newMajor,
+            'newPhone' => $newPhone
         ];
         $validate = new Validate($rule, $msg);
         $result = $validate->check($data);
@@ -215,23 +220,22 @@ class User extends Auth
                 ]
             );
         }
-        $userQq = input('post.userQq');
-        $userHome = input('post.userHome');
-        $description = input('post.description');
-        if ($nickName) {
-            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['username' => $nickName]);
-        }
-        if ($email) {
-            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['usermail' => $email]);
-        }
-        if ($userQq) {
-            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['userqq' => $userQq]);
-        }
-        if ($userHome) {
-            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['userhome' => $userHome]);
-        }
-        if ($description) {
-            $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['description' => $description]);
+        $user = new UserModel();
+        $result=$user->where('id', Session::get('id'))
+            ->update(
+                [
+                    'name' => $newName,
+                    'major' => $newMajor,
+                    'phone' => $newPhone
+                ]
+            );
+        if (!$result){
+            return json_encode(
+                [
+                    'code'=>'0001',
+                    'msg'=>'修改失败'
+                ]
+            );
         }
         return json_encode(
             [
@@ -241,20 +245,29 @@ class User extends Auth
         );
     }
     // 修改密码
-    public function change_password(){
-        $member = new MemberModel();
+    public function changePassword(){
+        $user = new UserModel();
         $newPassword = input('post.newPassword');
         $oldPassword = input('post.oldPassword');
-        $result=$member->table('tp_member')->where('userid', Session::get('userid'))->where('password',$oldPassword)->select();
+
+        $result=$user->where('id', Session::get('id'))->where('password',md5($oldPassword))->select();
         if ($result===[]){
             return json_encode(
                 [
-                    'code' => '0000',
+                    'code' => '0001',
                     'msg' => '旧密码有误'
                 ]
             );
         }
-        $result=$member->table('tp_member')->where('userid', Session::get('userid'))->update(['password' => $newPassword]);
+        if ($newPassword/100000 < 10){
+            return json_encode(
+                [
+                    'code' => '0002',
+                    'msg' => '新密码太短'
+                ]
+            );
+        }
+        $result=$user->where('id', Session::get('id'))->update(['password' => md5($newPassword)]);
         return json_encode(
             [
                 'code' => '0000',
@@ -287,4 +300,37 @@ class User extends Auth
             ]
         );
     }
+
+    public function getUserList(){
+        $page = input('get.page',1);
+        $pageSize = 5;
+        $users = new UserModel();
+        $totalCount=$users->where('id','>', '0')->where('job','<','5')->count();
+        $pageCount=ceil($totalCount/$pageSize);
+        //step 3. 获取分页数据
+        $result=$users->where('id','>',0)->where('job','<',5)->page($page,$pageSize)->select();
+
+        $userList = [];
+        foreach ($result as $user){
+            array_push($userList,[
+                'account'=>$user->account,
+                'name'=>$user->name,
+                'phone'=>$user->phone,
+                'major'=>$user->major,
+                'job'=>$user->job,
+                'id'=>$user->id
+            ]);
+        }
+        return json_encode(
+            [
+                'code' => '0000',
+                'msg' => '获取成功!',
+                'data' =>[
+                    'userList'=>$userList,
+                    'pageCount' =>$pageCount
+                ]
+            ]
+        );
+    }
+
 }

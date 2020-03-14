@@ -131,7 +131,7 @@
                                 <td>${element.competition}</td>
                                 <td>${element.material}</td>
                                 <td>${element.travel}</td>
-                                <td>${element.assets}sssssss</td>
+                                <td>${element.assets}</td>
                                 <td>审核中</td>
                                 <td>
                                     <button class="revoke" data-id="${element.id}">撤销</button>
@@ -231,8 +231,8 @@
                     //总页数低于页码总数
                     laypage.render({
                         elem: 'demo0',
-                        limit: 3
-                        ,count: 3*pageCount //数据总数
+                        limit: 5
+                        ,count: 5*pageCount //数据总数
                         ,jump: function(obj, first){
                             if(!first){
                                 getFormList(obj.curr)

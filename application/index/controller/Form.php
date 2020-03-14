@@ -8,6 +8,7 @@ use think\Controller;
 
 use app\index\model\Form as FormModel;
 use app\index\model\Upload as UploadModel;
+use app\index\model\User as UserModel;
 use think\Session;
 
 class Form extends Controller
@@ -37,13 +38,11 @@ class Form extends Controller
             ]);
         }
 
-        // 填入表单的主要数据
+        // 插入各项总金额
         $form = new FormModel();
         $form->user_id = Session::get('id');
         $form->date = $date;
         $form->type = $type;
-        $form->name = '王老师';
-        $form-> next_manage= '0';
         $form->time_stamp = $timeStamp;
         $form->office = $expense[0];
         $form->entertain = $expense[1];
@@ -53,8 +52,9 @@ class Form extends Controller
         $form->competition = $expense[5];
         $form->material = $expense[6];
         $form->travel  = $expense[7];
-        $form->assets  = $expense[8];
-        $form->next_manager = 1;
+        $form->travel_detail  = $expense[8];
+        $form->assets  = $expense[9];
+        $form->process = 1;
         $form->save();
 
         // 拿到表单的id
@@ -96,8 +96,8 @@ class Form extends Controller
         }
         $resultData = input('post.businessTravel');
         $resultData = json_decode($resultData);
-        // 合计不为零才要录入
-        if($resultData->basic->header[7] !== '0'){
+        // 插入差旅费
+        if($expense[8] !== '0'){
             $businessTravel = new BusinessTravel();
             $header = $resultData->basic->header;
             $body = $resultData->basic->body;
@@ -124,24 +124,24 @@ class Form extends Controller
             $businessTravel->food_standard = $body[6];
             $businessTravel->food_expense = $body[7];
             $businessTravel->traffic_standard = $body[8];
-            $businessTravel->traffic_expend = $body[9];
+            $businessTravel->traffic_expense = $body[9];
             $businessTravel->train_expense = $body[10];
             $businessTravel->other = $body[11];
             $businessTravel->save();
-            foreach ($detail as $traficDetailItem){
-                $traficDetail = new TrafficDetail();
-                if($traficDetailItem->value_0 !== ''){
-                    $traficDetail->form_id = $formId;
-                    $traficDetail->name = $traficDetailItem->value_0;
-                    $traficDetail->time = $traficDetailItem->value_1;
-                    $traficDetail->begin_place = $traficDetailItem->value_2;
-                    $traficDetail->arrive_place = $traficDetailItem->value_3;
-                    $traficDetail->kilometre = $traficDetailItem->value_4;
-                    $traficDetail->reason = $traficDetailItem->value_5;
-                    $traficDetail->save();
-                }
-            }
 
+        }
+        // 插入交通费
+        foreach ($detail as $traficDetailItem){
+            $traficDetail = new TrafficDetail();
+            $traficDetail->form_id = $formId;
+            $traficDetail->name = $traficDetailItem->value_0;
+            $traficDetail->time = $traficDetailItem->value_1;
+            $traficDetail->begin_place = $traficDetailItem->value_2;
+            $traficDetail->arrive_place = $traficDetailItem->value_3;
+            $traficDetail->travel_range = $traficDetailItem->value_4;
+            $traficDetail->kilometre = $traficDetailItem->value_5;
+            $traficDetail->reason = $traficDetailItem->value_6;
+            $traficDetail->save();
         }
         return(json_encode([
             'code' => '0000',
@@ -153,12 +153,13 @@ class Form extends Controller
     // 获取用户自己申请中的表单
     public function getUserFormList(){
         $page = input("get.page","1");
+        $type = input("get.type","0");
         //step 1.格式化数据
         $page=(int) $page;
 
         //step 2. 计算分页
         $form = new FormModel();
-        $pageSize=3;
+        $pageSize=5;
         $totalCount=$form->where('user_id',Session::get('id'))->where('status',0)->count();
         $pageCount=ceil($totalCount/$pageSize);
 
@@ -175,11 +176,14 @@ class Form extends Controller
 
         //step 4.获取每一条问题到底是谁发起的
         $formList=[];
+        $user = new UserModel();
         foreach($result as $formItem){
+            $userId = $formItem->user_id;
+            $userName = $user->where('id',$userId)->find()->name;
             array_push($formList,[
                 "id"=>$formItem->id,
                 "date"=>$formItem->date,
-                "name"=>$formItem->name,
+                "name"=>$userName,
                 "type"=>$formItem->type,
                 "office"=>$formItem->office,
                 "entertain"=>$formItem->entertain,
@@ -190,6 +194,7 @@ class Form extends Controller
                 "material"=>$formItem->material,
                 "travel"=>$formItem->travel,
                 "assets"=>$formItem->assets,
+                "travel_detail" => $formItem->travel_detail,
                 "status"=>$formItem->status,
             ]);
         }
@@ -212,7 +217,7 @@ class Form extends Controller
         $page=(int) $page;
         //step 2. 计算分页
         $form = new FormModel();
-        $pageSize=3;
+        $pageSize=5;
         $totalCount=$form->where('user_id',Session::get('id'))->where('status','>',0)->count();
         $pageCount=ceil($totalCount/$pageSize);
 
@@ -229,11 +234,14 @@ class Form extends Controller
 
         //step 4.获取每一条问题到底是谁发起的
         $formList=[];
+        $user = new UserModel();
         foreach($result as $formItem){
+            $userId = $formItem->user_id;
+            $userName = $user->where('id',$userId)->find()->name;
             array_push($formList,[
                 "id"=>$formItem->id,
                 "date"=>$formItem->date,
-                "name"=>$formItem->name,
+                "name"=>$userName,
                 "type"=>$formItem->type,
                 "office"=>$formItem->office,
                 "entertain"=>$formItem->entertain,
@@ -244,6 +252,8 @@ class Form extends Controller
                 "material"=>$formItem->material,
                 "travel"=>$formItem->travel,
                 "assets"=>$formItem->assets,
+                "travel_detail" => $formItem->travel_detail,
+                "process"=>$formItem->process,
                 "status"=>$formItem->status,
                 "reason"=>$formItem->reason,
             ]);
@@ -260,22 +270,34 @@ class Form extends Controller
         );
     }
 
+
+
     // 后台
     // 获取需要审核的表单
     public function getFormList(){
         $page = input("get.page","1");
+        $type = input("get.type",0);
         $level = Session::get('job')  === 4 ? 1 :2;
         //step 1.格式化数据
         $page=(int) $page;
 
         //step 2. 计算分页
         $form = new FormModel();
-        $pageSize=3;
-        $totalCount=$form->where('status',0)->where('process',$level)->count();
-        $pageCount=ceil($totalCount/$pageSize);
+        $pageSize=5;
+        $result = false;
+        if ((int) $type === 0){
+            $totalCount=$form->where('status',0)->count();
+            $pageCount=ceil($totalCount/$pageSize);
+            //step 3. 获取分页数据
+            $result=$form->where('status',0)->page($page,$pageSize)->select();
+        }else{
+            $totalCount=$form->where('status',0)->where('process',$level)->where('type',$type)->count();
+            $pageCount=ceil($totalCount/$pageSize);
 
-        //step 3. 获取分页数据
-        $result=$form->where('status',0)->where('process',$level)->page($page,$pageSize)->select();
+            //step 3. 获取分页数据
+            $result=$form->where('status',0)->where('type',$type)->where('process',$level)->page($page,$pageSize)->select();
+
+        }
         if(!$result){
             return json_encode(
                 [
@@ -287,11 +309,14 @@ class Form extends Controller
 
         //step 4.获取每一条问题到底是谁发起的
         $formList=[];
+        $user = new UserModel();
         foreach($result as $formItem){
+            $userId = $formItem->user_id;
+            $userName = $user->where('id',$userId)->find()->name;
             array_push($formList,[
                 "id"=>$formItem->id,
                 "date"=>$formItem->date,
-                "name"=>$formItem->name,
+                "name"=>$userName,
                 "type"=>$formItem->type,
                 "office"=>$formItem->office,
                 "entertain"=>$formItem->entertain,
@@ -301,6 +326,7 @@ class Form extends Controller
                 "competition"=>$formItem->competition,
                 "material"=>$formItem->material,
                 "travel"=>$formItem->travel,
+                "travel_detail"=>$formItem->travel_detail,
                 "assets"=>$formItem->assets,
                 "status"=>$formItem->status,
             ]);
@@ -320,17 +346,26 @@ class Form extends Controller
     // 获取已审核的表单
     public function getFormResult(){
         $page = input("get.page","1");
+        $type = input("get.type",0);
         //step 1.格式化数据
         $page=(int) $page;
 
         //step 2. 计算分页
         $form = new FormModel();
-        $pageSize=3;
-        $totalCount=$form->where('status','>',0)->count();
-        $pageCount=ceil($totalCount/$pageSize);
+        $pageSize=5;
+        if ( (int) $type === 0){
+            $totalCount=$form->where('status','>',0)->count();
+            $pageCount=ceil($totalCount/$pageSize);
 
-        //step 3. 获取分页数据
-        $result=$form->where('status','>',0)->page($page,$pageSize)->select();
+            //step 3. 获取分页数据
+            $result=$form->where('status','>',0)->page($page,$pageSize)->select();
+        }else{
+            $totalCount=$form->where('status','>',0)->where('type',$type)->count();
+            $pageCount=ceil($totalCount/$pageSize);
+
+            //step 3. 获取分页数据
+            $result=$form->where('status','>',0)->where('type',$type)->page($page,$pageSize)->select();
+        }
         if(!$result){
             return json_encode(
                 [
@@ -342,11 +377,14 @@ class Form extends Controller
 
         //step 4.获取每一条问题到底是谁发起的
         $formList=[];
+        $user = new UserModel();
         foreach($result as $formItem){
+            $userId = $formItem->user_id;
+            $userName = $user->where('id',$userId)->find()->name;
             array_push($formList,[
                 "id"=>$formItem->id,
                 "date"=>$formItem->date,
-                "name"=>$formItem->name,
+                "name"=>$userName,
                 "type"=>$formItem->type,
                 "office"=>$formItem->office,
                 "entertain"=>$formItem->entertain,
@@ -357,6 +395,8 @@ class Form extends Controller
                 "material"=>$formItem->material,
                 "travel"=>$formItem->travel,
                 "assets"=>$formItem->assets,
+                "travel_detail"=>$formItem->travel_detail,
+                "process"=>$formItem->process,
                 "status"=>$formItem->status,
                 "reason"=>$formItem->reason
             ]);
@@ -378,10 +418,12 @@ class Form extends Controller
         $id = input('get.id');
         $form = new FormModel();
         $formItem = $form->where('id', $id)->find();
+        $user = new UserModel();
+        $userName = $user->where('id',$formItem->user_id)->find()->name;
         $basicData=[
             "id"=>$formItem->id,
             "date"=>$formItem->date,
-            "name"=>$formItem->name,
+            "name"=>$userName,
             "type"=>$formItem->type,
             "office"=>$formItem->office,
             "entertain"=>$formItem->entertain,
@@ -409,58 +451,48 @@ class Form extends Controller
     // 获取差旅费
     public  function getFormBusinessTravel(){
         $formId = input('get.id');
-        $result = new BusinessTravel();
-        $result = $result->where('form_id', $formId)->find();
-        if(!$result){
-            return json_encode([
-                'code'=> '0001',
-                'msg' => '该表单没有填写差旅费详情'
-            ]);
-        }
-        $basicData = [
-            'name'=>$result->name,
-            'level'=>$result->level,
-            'reason'=>$result->reason,
-            'begin_time'=>$result->begin_time ,
-            'end_time'=>$result->end_time,
-            'begin_place'=>$result->begin_place,
-            'arrive_place'=>$result->arrive_place,
-            'train'=>$result->sum ,
-            'plane'=>$result->sum ,
-            'bus'=>$result->sum ,
-            'other_tools'=>$result->sum ,
-            'accommodation_standard'=>$result->sum ,
-            'accommodation_expense'=>$result->sum ,
-            'food_standard'=>$result->sum ,
-            'food_expense'=>$result->sum ,
-            'traffic_standard'=>$result->sum ,
-            'traffic_expend'=>$result->sum ,
-            'train_expense'=>$result->train_expense ,
-            'other'=>$result->sum ,
-            'sum'=>$result->sum
-        ];
         $trafic = new TrafficDetail();
         $traficDetail = $trafic->where('form_id',$formId)->select();
-        if (!$traficDetail){
-            return json_encode([
-                'code'=> '0000',
-                'msg' => '获取成功',
-                'data' => [
-                    'basicData'=> $basicData
-                ]
-            ]);
-        }
         $detailList = [];
-        foreach ($traficDetail as $traficDetailItem) {
-            array_push($detailList,[
-                'form_id'=>$traficDetailItem->form_id,
-                'name'=>$traficDetailItem->name,
-                'time'=>$traficDetailItem->time,
-                'begin_place'=>$traficDetailItem->begin_place,
-                'arrive_place'=>$traficDetailItem->arrive_place,
-                'kilometre'=>$traficDetailItem->kilometre,
-                'reason'=>$traficDetailItem->reason,
-            ]);
+        if($traficDetail){
+            foreach ($traficDetail as $traficDetailItem) {
+                array_push($detailList,[
+                    'form_id'=>$traficDetailItem->form_id,
+                    'name'=>$traficDetailItem->name,
+                    'time'=>$traficDetailItem->time,
+                    'begin_place'=>$traficDetailItem->begin_place,
+                    'arrive_place'=>$traficDetailItem->arrive_place,
+                    'kilometre'=>$traficDetailItem->kilometre,
+                    'travel_range'=>$traficDetailItem->travel_range,
+                    'reason'=>$traficDetailItem->reason,
+                ]);
+            }
+        }
+        $result = new BusinessTravel();
+        $result = $result->where('form_id', $formId)->find();
+        if ($result){
+            $basicData = [
+                'name'=>$result->name,
+                'level'=>$result->level,
+                'reason'=>$result->reason,
+                'begin_time'=>$result->begin_time ,
+                'end_time'=>$result->end_time,
+                'begin_place'=>$result->begin_place,
+                'arrive_place'=>$result->arrive_place,
+                'train'=>$result->sum ,
+                'plane'=>$result->sum ,
+                'bus'=>$result->sum ,
+                'other_tools'=>$result->sum ,
+                'accommodation_standard'=>$result->sum ,
+                'accommodation_expense'=>$result->sum ,
+                'food_standard'=>$result->sum ,
+                'food_expense'=>$result->sum ,
+                'traffic_standard'=>$result->sum ,
+                'traffic_expense'=>$result->sum ,
+                'train_expense'=>$result->train_expense ,
+                'other'=>$result->sum ,
+                'sum'=>$result->sum
+            ];
         }
         return json_encode([
             'code'=> '0000',
@@ -564,7 +596,7 @@ class Form extends Controller
         if($process === 1){
             $form->where('id', $formId)->update(['process'=>2]);
         }else{
-            $form->where('id', $formId)->update(['status'=>1]);
+            $form->where('id', $formId)->update(['status'=>1, 'process'=>2]);
         }
 
         return json_encode([

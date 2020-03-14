@@ -85,7 +85,7 @@
         })
         function getFormList(page = 1){
             $.ajax({
-                url: '__PUBLIC__/index/Form/getUserFormList',
+                url: '__PUBLIC__/index/Form/getUserFormResult',
                 type: 'get',
                 data:{
                     page
@@ -93,9 +93,10 @@
                 success:function (response) {
                     response = JSON.parse(response)
                     if(response.code !== '0000'){
-                        $('#form-container').html('当前没有人申请')
+                        $('#form-container').html('当前没有数据')
                         return
                     }
+                    console.log(response)
                     let forms = response.data.forms
                     let html = `
                     <table id="forms">
@@ -112,12 +113,15 @@
                             <th>材料物料费</th>
                             <th>差旅费</th>
                             <th>固定资产费</th>
+                            <th>交通费</th>
                             <th>状态</th>
                             <th>原因</th>
+                            <th>审核人</th>
 
                         </tr>
                     `
                     forms.forEach(element => {
+                        console.log(element)
                         html += `
                             <tr>
                                 <td>${element.date}</td>
@@ -131,10 +135,14 @@
                                 <td>${element.competition}</td>
                                 <td>${element.material}</td>
                                 <td>${element.travel}</td>
-                                <td>${element.assets}sssssss</td>
-                                <td>${element.status === 1 ? '通过审核' : '不通过'}</td>
+                                <td>${element.assets}</td>
+                                <td>${element.travel_detail}</td>
+                                <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
                                 <td>
                                     ${element.reason}
+                                </td>
+                                <td>
+                                    ${element.process===1 ? '报账助理' : '报账总负责人' }
                                 </td>
                             </tr>
                     `})
@@ -170,7 +178,7 @@
                         success:function (response) {
                             response = JSON.parse(response)
                             if(response.code !== '0000'){
-                                $('#form-container').html('当前没有人申请')
+                                $('#form-container').html('当前没有数据')
                                 return
                             }
                             let forms = response.data.forms
@@ -189,11 +197,15 @@
                                         <th>材料物料费</th>
                                         <th>差旅费</th>
                                         <th>固定资产费</th>
+                                        <th>交通费</th>
                                         <th>状态</th>
                                         <th>原因</th>
+                                        <th>审核人</th>
                                     </tr>
                             `
                             forms.forEach(element => {
+                        console.log(element)
+
                                 html += `
                                     <tr>
                                         <td>${element.date}</td>
@@ -208,9 +220,13 @@
                                         <td>${element.material}</td>
                                         <td>${element.travel}</td>
                                         <td>${element.assets}</td>
+                                        <td>${element.travel_detail}</td>
                                         <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
                                         <td>
                                             ${element.reason}
+                                        </td>
+                                        <td>
+                                            ${element.process===1 ? '报账助理' : '报账总负责人' }
                                         </td>
                                     </tr>
                             `})
@@ -231,40 +247,14 @@
                     //总页数低于页码总数
                     laypage.render({
                         elem: 'demo0',
-                        limit: 3
-                        ,count: 3*pageCount //数据总数
+                        limit: 5
+                        ,count: 5*pageCount //数据总数
                         ,jump: function(obj, first){
                             if(!first){
                                 getFormList(obj.curr)
                             }
                         }
                     });
-                })
-                $('#form-container').click(function($event){
-                    // 撤销
-                    if($($event.target).get(0).className === 'revoke'){
-                        let tr = $($($event.target).get(0).parentElement.parentElement)
-                        if(confirm('确定撤销该表单吗')){
-                            $.ajax({
-                                url: '__PUBLIC__/index/Form/revokeForm',
-                                type: 'post',
-                                data: {
-                                    id: $($($event.target).get(0)).data('id')
-                                },
-                                success:function(response){
-                                    response= JSON.parse(response)
-                                    if(response.code !== '0000'){
-                                        layer.msg('撤销失败，请联系管理员')
-                                        return
-                                    }
-                                    layer.msg('撤销成功')
-                                    tr.remove()
-                                }
-                            })
-                        }else{
-                            layer.msg('您取消了操作')
-                        }
-                    }
                 })
             })
          

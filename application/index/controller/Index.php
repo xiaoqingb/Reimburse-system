@@ -28,5 +28,6 @@ class Index
     public function admin_form_detail(){return view();}
     public function admin_profile(){return view();}
     public function admin_applied(){return view();}
+    public function user_list(){return view();}
 
 }

@@ -30,4 +30,5 @@ return [
     'admin-form-detail' => 'index/index/admin_form_detail',
     'admin_profile' => 'index/index/admin_profile',
     'admin_applied' => 'index/index/admin_applied',
+    'user_list' => 'index/index/user_list'
  ];

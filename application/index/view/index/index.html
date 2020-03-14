@@ -35,7 +35,7 @@
         <div id="menu">
             <ul>
                 <li class="menu-item bg-dark">
-                    <a href="apply"">
+                    <a href="apply">
                         <span>申请报销</span>
                     </a>
                 </li>
@@ -190,6 +190,14 @@
                             </div>
                             <button type="button" id="next-3" class="layui-btn ">填写详细单据</button>
                         </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">交通费</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="expense-10" placeholder="" autocomplete="off" class="layui-input">
+                            </div>
+                            <button type="button" id="next-2-1" class="layui-btn ">填写详细单据</button>
+                        </div>
                     </div>
                     <button type="button" id="back-1" class="layui-btn ">后退</button>
                     <button type="button" id="submit" class="layui-btn layui-btn-warm">提交</button>
@@ -249,7 +257,11 @@
                         </tr>
                     </table>
                     <button type="button" id="back-3" class="layui-btn ">完成</button>
-                
+                    <div class="upload-btn">
+                        <span>上传图片</span>
+                        <input id="fileImage8" type="file" size="0" name="fileselect[]" multiple
+                            accept="image/jpeg,image/png" />
+                    </div>
                 </div>
 
                 <div id="form-4">
@@ -330,7 +342,6 @@
                             <td  id="business-20" class="cost"></td>
                         </tr>
                     </table>
-                    <button type="button" id="next-2-1" class="layui-btn ">填写交通费详单</button>
                     <button type="button" id="back-2" class="layui-btn ">完成</button>
 
                 </div>
@@ -348,6 +359,7 @@
                             <th rowspan="2" colspan="1">用车人</th>
                             <th rowspan="2" colspan="1">用车时间</th>
                             <th rowspan="1" colspan="2">用车区间</th>
+                            <th rowspan="2" colspan="1">行程范围</th>
                             <th rowspan="2" colspan="1">公里数</th>
                             <th rowspan="2" colspan="1">用车原因</th>
                         </tr>
@@ -360,6 +372,12 @@
                             <td class="traffic-item"></td>
                             <td class="traffic-item"></td>
                             <td class="traffic-item"></td>
+                            <td class="traffic-item traffic-range">
+                                <select  name="level-type" lay-verify="required">
+                                    <option value="2">市内</option>
+                                    <option value="3">市外</option>
+                                </select>
+                            </td>
                             <td class="traffic-item"></td>
                             <td class="traffic-item"></td>
                         </tr>
@@ -369,7 +387,7 @@
                             <th rowspan="1" >合计</th>
                         </tr>
                         <tr>
-                            <td id="trafic-sum"></td>
+                            <td id="traffic-sum"></td>
                         </tr>
                     </table>
                     <h1>
@@ -444,8 +462,26 @@
             // 数据无误即可更新合计
             $('#business-8')['0'].innerText = count
             $(`input[name="expense-8"]`).val(count)
+
+
+            let count2 = 0
+            let trafficRanges = $('.traffic-range')
+            for(let i = 0;i<trafficRanges.length;i++){
+                let km = $(trafficRanges[i]).get(0).nextElementSibling.innerHTML
+                let patten = /^[0-9]{0,8}$/
+                let num = patten.test(km) ? km : 0
+                let type = $(trafficRanges[i]).get(0).children[0].value
+                count2 += num * Number(type)
+            }
+            $('#traffic-sum').get(0).innerHTML = count2
+            $(`input[name="expense-10"]`).val(count2)
+
         }
 
+        // 交通费合计函数
+        function  trafficSum() {
+
+        }
         // 表格编辑
         function bindTd (){
             
@@ -464,7 +500,7 @@
                 // 表格点击
                 $("td").click(function (event) {
                     //  忽略掉不能做修改的几个格子，如标准，合计这些
-                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard' ){
+                    if($(this)['0'].id === 'level' || $(this)['0'].className === 'standard' ||$(this)['0'].className === 'traffic-item traffic-range'){
                         return
                     }
                     
@@ -488,30 +524,9 @@
                         .trigger("focus")
                         //用trigger方法触发事件
                         .trigger("select")
-                    inputObj.keyup(function (event) {
-                        if (13 == event.which)
-                        //用户按下回车
-                        {
-                            var text = $(this).val();
-                            tdObj.html(text)
-                            if($(this)['0'].id === 'traffic-sum'){
-                                $('#business-18')['0'].innerHTML = text
-                            }
-                            caculate()
-
-                        }
-                        else if (27 == event.which)
-                        //ESC键
-                        {
-                            tdObj.html(preText)
-                        }
-                    })
                     inputObj.blur(function(){
                         var text = $(this).val()
                         tdObj.html(text)
-                        if($(this)['0'].id === 'traffic-sum'){
-                            $('#business-18')['0'].innerHTML = text
-                        }
                         caculate()
                     })
                     //已进入编辑状态后，不再处理click事件
@@ -573,7 +588,7 @@
                     <span>差旅费  > </span>
                     <span class="current">交通费</span>
                 `)
-                $("#form-4")[0].style.display = 'none'
+                $("#form-2")[0].style.display = 'none'
                 $("#form-5")[0].style.display = 'block'
             })
             $('#next-3').click(() => {
@@ -611,7 +626,7 @@
                     <span class="current">差旅费</span>
                 `)
                 $("#form-5")[0].style.display = 'none'
-                $("#form-4")[0].style.display = 'block'
+                $("#form-2")[0].style.display = 'block'
             })
 
             $('#back-3').click(() => {
@@ -706,13 +721,19 @@
                 })
             })
             $('#new-row-traffic').click(()=>{
-                let length = $('.traffic-item').length/6 + 1
+                let length = $('.traffic-item').length/7 + 1
                 $($('#traffic').get(0).childNodes[1]).append(`
                     <tr>
                         <td class="new-row-traffic-${length} traffic-item"></td>
                         <td class="new-row-traffic-${length} traffic-item"></td>
                         <td class="new-row-traffic-${length} traffic-item"></td>
                         <td class="new-row-traffic-${length} traffic-item"></td>
+                        <td class="traffic-item traffic-range">
+                                <select  name="level-type" lay-verify="required">
+                                    <option value="2">市内</option>
+                                    <option value="3">市外</option>
+                                </select>
+                        </td>
                         <td class="new-row-traffic-${length} traffic-item"></td>
                         <td class="new-row-traffic-${length} traffic-item"></td>
                     </tr>
@@ -784,12 +805,12 @@
                 $($('#assets').get(0).childNodes[1]).get(0).children[lastIndex].remove()
             })
             $('#remove-row-traffic').click(function(){
-                if($('.traffic-item').length/6 === 1){
+                if($('.traffic-item').length/7 === 1){
                     layer.msg('只有一行了，不能再删除了喔')
                     return
                 }
-                let lastIndex = $('.traffic-item').length/6
-                $($('#traffic').get(0).childNodes[1]).get(0).children[lastIndex+1].remove()
+                let lastIndex = $('.traffic-item').length/7
+                $($('#traffic').get(0).childNodes[1]).get(0).children[lastIndex].remove()
             })
             
         }

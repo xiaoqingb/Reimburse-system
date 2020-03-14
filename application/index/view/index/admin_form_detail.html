@@ -34,17 +34,22 @@
     <main>
         <div id="menu">
             <ul class="">
-                <li class="menu-item">
+                <li class="menu-item bg-dark">
                     <a href="admin">
                         <span>审核列表</span>
                     </a>
                 </li>
                 <li class="menu-item">
                     <a href="admin_applied">
-                        <span>申请中</span>
+                        <span>已审核</span>
                     </a>
                 </li>
-                <li class="menu-item bg-dark">
+                <li class="menu-item">
+                    <a href="user_list">
+                        <span>教师管理</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="admin_profile">
                         <span>个人资料</span>
                     </a>
@@ -82,6 +87,9 @@
                     </li>
                     <li class="layui-nav-item" >
                         <a data-detail='assets'>固定资产费详情</a>
+                    </li>
+                    <li class="layui-nav-item" >
+                        <a data-detail='traffic'>交通费</a>
                     </li>
                     <li class="layui-nav-item" >
                         <a data-detail='images'>图片清单</a>
@@ -271,18 +279,41 @@
                                         <td id="business-15" class="standard">${basicData.food_standard}</td>
                                         <td id="business-16" class="cost">${basicData.food_expense}</td>
                                         <td id="business-17" class="standard">${basicData.traffic_standard}</td>
-                                        <td  id="business-18" class="cost">${basicData.traffic_expend}</td>
+                                        <td  id="business-18" class="cost">${basicData.traffic_expense}</td>
                                         <td  id="business-19" class="cost">${basicData.	train_expense}</td>
                                         <td  id="business-20" class="cost">${basicData.other}</td>
                                     </tr>
                                 </table>`
+                            html += `</table>`
+                            
+                            $('#detail').html(html)
+                        }
+                    })
+                },
+                traffic: ()=>{
+                    $.ajax({
+                        url:'__PUBLIC__/index/Form/getFormBusinessTravel',
+                        type: 'get',
+                        data:{
+                            id
+                        },
+                        success:(response)=>{
+                            response = JSON.parse(response)
+                            if(response.code !== '0000'){
+                                $('#detail').html('该表单没有差旅费详情')
+                                return
+                            }
+                            console.log(response.data);
+                            let basicData = response.data.basicData
+                            let detailList = response.data.detailList
+                            let html = ``
                             if(detailList){
-                                console.log('object');
                                 html += `<table id="traffic">
                                         <tr>
                                             <th rowspan="2" colspan="1">用车人</th>
                                             <th rowspan="2" colspan="1">用车时间</th>
                                             <th rowspan="1" colspan="2">用车区间</th>
+                                            <th rowspan="2" colspan="1">标准</th>
                                             <th rowspan="2" colspan="1">公里数</th>
                                             <th rowspan="2" colspan="1">用车原因</th>
                                         </tr>
@@ -290,6 +321,7 @@
                                             <th>出发</th>
                                             <th>到达</th>
                                         </tr>`
+                                console.log(detailList)
                                 detailList.forEach(element => {
                                     html += `
                                         <tr>
@@ -297,14 +329,15 @@
                                             <td class="traffic-item">${element.time}</td>
                                             <td class="traffic-item">${element.begin_place}</td>
                                             <td class="traffic-item">${element.arrive_place}</td>
+                                            <td class="traffic-item">${element.travel_range}</td>
                                             <td class="traffic-item">${element.kilometre}</td>
                                             <td class="traffic-item">${element.reason}</td>
                                         </tr>
                                     `
                                 });
-                                html += `</table>`        
+                                html += `</table>`
                             }
-                            
+
                             $('#detail').html(html)
                         }
                     })

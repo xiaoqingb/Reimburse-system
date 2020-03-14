@@ -43,6 +43,11 @@
                     </a>
                 </li>
                 <li class="menu-item">
+                    <a href="user_list">
+                        <span>教师管理</span>
+                    </a>
+                </li>
+                <li class="menu-item">
                     <a href="admin_profile">
                         <span>个人资料</span>
                     </a>
@@ -53,6 +58,20 @@
             <div id="header">
                 <span class="current">已审核</span>
             </div>
+            <div id="sort">
+
+                <button id="search">搜索</button>
+                <select name="city" lay-verify="required">
+                    <option value="0">所有</option>
+                    <option value="1">质量工程</option>
+                    <option value="2">学术讲座</option>
+                    <option value="3">专业建设活动</option>
+                    <option value="4">实习基地扩展</option>
+                    <option value="5">事件教学经费</option>
+                    <option value="6">学生活动经费</option>
+                </select>
+                <span>类型：</span>
+            </div>
             <div id="content">
                 <div id="form-container"></div>
                 <div id="demo0"></div>
@@ -60,7 +79,7 @@
         </div>
     </main>
     <script>
-        const type = [
+        const Type = [
             '质量工程',
             '学术讲座',
             '专业建设活动',
@@ -78,12 +97,16 @@
                 }
             })
         })
-        function getFormList(page = 1){
+        $('#search').click(function () {
+            sort(1,$('select').get(0).value)
+        })
+        function getFormList(page = 1, type){
             $.ajax({
                 url: '__PUBLIC__/index/Form/getFormResult',
                 type: 'get',
                 data:{
-                    page
+                    page,
+                    type
                 },
                 success:function (response) {
                     response = JSON.parse(response)
@@ -109,7 +132,7 @@
                             <th>固定资产费</th>
                             <th>状态</th>
                             <th>原因</th>
-
+                            <th>审核人</th>
                         </tr>
                     `
                     forms.forEach(element => {
@@ -117,7 +140,7 @@
                             <tr>
                                 <td>${element.date}</td>
                                 <td>${element.name}</td>
-                                <td>${type[element.type - 1]}</td>
+                                <td>${Type[element.type - 1]}</td>
                                 <td>${element.office}</td>
                                 <td>${element.entertain}</td>
                                 <td>${element.meeting}</td>
@@ -131,6 +154,9 @@
                                 <td>
                                     ${element.reason}
                                 </td>
+                                <td>
+                                    ${element.process===1 ? '报账助理' : '报账总负责人' }
+                                </td>
                             </tr>
                     `})
                     html += `</table>`
@@ -138,7 +164,86 @@
                 }
             })
         }
-        
+        function sort(page = 1,type){
+            $.ajax({
+                url: '__PUBLIC__/index/Form/getFormResult',
+                type: 'get',
+                data:{
+                    page
+                    ,type
+                },
+                success:function (response) {
+                    response = JSON.parse(response)
+                    if(response.code !== '0000'){
+                        $('#form-container').html('当前没有人申请')
+                        return
+                    }
+                    let forms = response.data.forms
+                    let html = `
+                    <table id="forms">
+                        <tr>
+                            <th>时间</th>
+                            <th>姓名</th>
+                            <th>类型</th>
+                            <th>办公费</th>
+                            <th>招待费</th>
+                            <th>会议费</th>
+                            <th>培训费</th>
+                            <th>学生活动费</th>
+                            <th>学生竞赛费</th>
+                            <th>材料物料费</th>
+                            <th>差旅费</th>
+                            <th>固定资产费</th>
+                            <th>状态</th>
+                            <th>原因</th>
+                            <th>审核人</th>
+                        </tr>
+                    `
+                    forms.forEach(element => {
+                        html += `
+                            <tr>
+                                <td>${element.date}</td>
+                                <td>${element.name}</td>
+                                <td>${Type[element.type - 1]}</td>
+                                <td>${element.office}</td>
+                                <td>${element.entertain}</td>
+                                <td>${element.meeting}</td>
+                                <td>${element.train}</td>
+                                <td>${element.activity}</td>
+                                <td>${element.competition}</td>
+                                <td>${element.material}</td>
+                                <td>${element.travel}</td>
+                                <td>${element.assets}</td>
+                                <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
+                                <td>
+                                    ${element.reason}
+                                </td>
+                                <td>
+                                    ${element.process===1 ? '报账助理' : '报账总负责人' }
+                                </td>
+                            </tr>
+                    `})
+                    html += `</table>`
+                    $('#form-container').html(html)
+                    $('#demo0').remove()
+                    $('#content').append(`<div id="demo0"></div>`)
+                    layui.use(['laypage'], function() {
+                        var laypage = layui.laypage
+                            .
+                            render({
+                                elem: 'demo0',
+                                limit: 5
+                                , count: 5 * response.data.pageCount //数据总数
+                                , jump: function (obj, first) {
+                                    if (!first) {
+                                        getFormList(obj.curr, $('select').get(0).value)
+                                    }
+                                }
+                            });
+                    })
+                }
+            })
+        }
         window.onload = function(){
             let p1 = function (){
                 return new Promise(function(resolve,reject){
@@ -187,6 +292,8 @@
                                         <th>固定资产费</th>
                                         <th>状态</th>
                                         <th>原因</th>
+                                        <th>审核人</th>
+
                                     </tr>
                             `
                             forms.forEach(element => {
@@ -194,7 +301,7 @@
                                     <tr>
                                         <td>${element.date}</td>
                                         <td>${element.name}</td>
-                                        <td>${type[element.type - 1]}</td>
+                                        <td>${Type[element.type - 1]}</td>
                                         <td>${element.office}</td>
                                         <td>${element.entertain}</td>
                                         <td>${element.meeting}</td>
@@ -207,6 +314,9 @@
                                         <td  style="color:${element.status === 1 ? 'blue' : 'red'}">${element.status === 1 ? '通过审核' : '不通过'}</td>
                                         <td>
                                             ${element.reason}
+                                        </td>
+                                        <td>
+                                            ${element.process===1 ? '报账助理' : '报账总负责人' }
                                         </td>
                                     </tr>
                             `})
@@ -227,8 +337,8 @@
                     //总页数低于页码总数
                     laypage.render({
                         elem: 'demo0',
-                        limit: 3
-                        ,count: 3*pageCount //数据总数
+                        limit: 5
+                        ,count: 5*pageCount //数据总数
                         ,jump: function(obj, first){
                             if(!first){
                                 getFormList(obj.curr)

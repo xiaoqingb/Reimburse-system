@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <!-- <link href="__PUBLIC__/static/styles/less/apply.less" rel="stylesheet/less"> -->
     <link rel="stylesheet/less" type="text/css" href="__PUBLIC__/static/styles/less/admin.less">
     <link href="__PUBLIC__/static/lib/layui/css/layui.css" rel="stylesheet">
     <script src="__PUBLIC__/static/lib/jquery-3.4.1.js"></script>
@@ -25,7 +24,7 @@
                 <a href="javascript:;" id="user-name"></a>
                 <dl class="layui-nav-child">
                     <!-- 二级菜单 -->
-                    <dd><a href="admin_profile" >个人资料</a></dd>
+                    <dd><a href="admin_profile">个人资料</a></dd>
                     <dd><a href="" id="logout">注销</a></dd>
                 </dl>
             </li>
@@ -44,6 +43,11 @@
                         <span>已审核</span>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="user_list">
+                        <span>教师管理</span>
+                    </a>
+                </li>
                 <li class="menu-item bg-dark">
                     <a href="admin_profile">
                         <span>个人资料</span>
@@ -53,49 +57,194 @@
         </div>
         <div id="page">
             <div id="header">
-                <span><a href="admin_profile">个人资料 </a></span>
+                <span class="current">个人信息</span>
             </div>
             <div id="content">
-               
+                <div class="layui-form-item layui-form-pane">
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-inline">
+                        <input type="text"  class="layui-input" id="name" disabled>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-pane">
+                    <label class="layui-form-label">专业</label>
+                    <div class="layui-inline">
+                        <input type="text"  class="layui-input" id="major" disabled>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-pane">
+                    <label class="layui-form-label">电话</label>
+                    <div class="layui-inline">
+                        <input type="text"  class="layui-input" id="phone" disabled>
+                    </div>
+                </div>
+                <button class="layui-btn layui-btn-primary" id="change-msg">修改信息</button>
+                <button class="layui-btn " id="change-password">更换密码</button>
             </div>
         </div>
-        </div>
     </main>
-
-
     <script>
-        layui.use(['element','layer'], function(){
-            var element = layui.element,
-            layer = layui.layer
+        layui.use(['element','form'], function () {
+                let element = layui.element,
+                form = layui.form
+        });
+        $('#logout').click(()=>{
+            $.ajax({
+                url: "__PUBLIC__/index/User/logout",
+                type: "post",
+                success:  (response)=>{
+                    response = JSON.parse(response)
+                    location.href = "login"
+                }
+            })
         })
-        window.onload = function () {
+        $('#change-msg').click(()=>{
+
+            $('body').append(`
+                <div id="black-bg">
+                    <div id='edit-window'>
+                        <div class="layui-form-item layui-form-pane">
+                            <label class="layui-form-label">姓名</label>
+                            <div class="layui-inline">
+                                <input type="text"  class="layui-input" id="editName" >
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-pane">
+                            <label class="layui-form-label">专业</label>
+                            <div class="layui-inline">
+                                <div id="select-box">
+                                    <select name="major">
+                                        <option value="人力资源">人力资源</option>
+                                        <option value="信息管理与信息系统">信息管理与信息系统</option>
+                                        <option value="市场营销">市场营销</option>
+                                        <option value="国际商务">国际商务</option>
+                                        <option value="工程管理">工程管理</option>
+                                        <option value="物流管理">物流管理</option>
+                                        <option value="国际经济与国际贸易">国际经济与国际贸易</option>
+                                    </select>  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-pane">
+                            <label class="layui-form-label">电话</label>
+                            <div class="layui-inline">
+                                <input type="text"  class="layui-input" id="editPhone" >
+                            </div>
+                        </div>
+                        <button class="layui-btn layui-btn-primary"  id="submit">提交</button>
+                        <button class="layui-btn " id="cancel">取消</button>
+                    <div>
+                </div>
+            `)
+            $('#editName').val($('#name').val())
+            $('#editPhone').val($('#phone').val())
+
+            $('#cancel').click(function(){
+                $('#black-bg').remove()
+            })
+
+            $('#submit').click(function(){
+                $.ajax({
+                    url: '__PUBLIC__/index/User/changeMsg',
+                    type: 'post',
+                    data: {
+                        newName:  $('#editName').val(),
+                        newPhone: $('#editPhone').val(),
+                        newMajor: $('select').get(0).value
+                    },
+                    success:function(response){
+                        response= JSON.parse(response)
+                        if(response.code !== '0000'){
+                            layer.msg(response.msg)
+                            $('#black-bg').get(0).remove()
+                            return
+                        }
+                        layer.msg('提交成功')
+                        $('#black-bg').get(0).remove()
+                        setTimeout(() => {
+                            location.reload()
+                        }, 2000);
+                    }
+                })
+            })
+        })
+        $('#change-password').click(()=>{
+            $('body').append(`
+                <div id="black-bg">
+                    <div id='edit-window'>
+                        <div class="layui-form-item layui-form-pane">
+                            <label class="layui-form-label">旧密码</label>
+                            <div class="layui-inline">
+                                <input type="text"  class="layui-input" id="oldPassword" >
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-pane">
+                            <label class="layui-form-label">新密码</label>
+                            <div class="layui-inline">
+                                <input type="text"  class="layui-input" id="newPassword" >
+                            </div>
+                        </div>
+                        <button class="layui-btn layui-btn-primary"  id="submit">提交</button>
+                        <button class="layui-btn " id="cancel">取消</button>
+                    <div>
+                </div>
+            `)
+
+            $('#cancel').click(function(){
+                $('#black-bg').remove()
+            })
+
+            $('#submit').click(function(){
+                $.ajax({
+                    url: '__PUBLIC__/index/User/changePassword',
+                    type: 'post',
+                    data: {
+                        oldPassword:  $('#oldPassword').val(),
+                        newPassword: $('#newPassword').val(),
+                    },
+                    success:function(response){
+                        response= JSON.parse(response)
+                        if(response.code !== '0000'){
+                            layer.msg(response.msg)
+                            // $('#black-bg').get(0).remove()
+                            return
+                        }
+                        layer.msg('修改成功')
+                        $('#black-bg').get(0).remove()
+                    }
+                })
+            })
+        })
+        window.onload = function(){
             $.ajax({
                 url: "__PUBLIC__/index/User/getAdminName",
-                type: "get",
                 async:false,
+                type: "get",
                 success:  (response)=>{
                     response = JSON.parse(response);
                     // 获取失败则跳转dao登录页面
                     if (response.code!== "0000") {
                         location.href = "login"
-                        return;
+                        return
                     }
                     // 获取成功则输出昵称
                     $("#user-name").append(response.data)
                 }
-            })
-            $('#logout').click(()=>{
-                $.ajax({
-                    url: "__PUBLIC__/index/User/logout",
-                    type: "post",
-                    success:  (response)=>{
-                        response = JSON.parse(response);
-                        location.href = "login"
-                    }
-                })
-            })
+            });
+            $.ajax({
+                url: "__PUBLIC__/index/User/getUserMsg",
+                async:false,
+                type: "get",
+                success:  (response)=>{
+                    response = JSON.parse(response)
+                    $('#name').val(response.data.name)
+                    $('#major').val(response.data.major)
+                    $('#phone').val(response.data.phone)
+                }
+            });
+
         }
+
     </script>
 </body>
-
 </html>
